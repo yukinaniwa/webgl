@@ -2,21 +2,21 @@
 
 	Theme Name: avana LLC
 
-	Template URI: 
+	Template URI:
 
-	Description: 
+	Description:
 
 	Author:
 
-	Author URI: 
+	Author URI:
 
-	License: 
+	License:
 
 	License URI:
 
 	Version: 1.0
 
-	
+
 
 	1. Body style
 
@@ -28,7 +28,7 @@
 
 	5. About
 
-	
+
 
 */
 
@@ -221,8 +221,8 @@ main[role="main-home-wrapper"] article[role="pge-title-content"],main[role="main
 main[role="main-home-wrapper"] article[role="pge-title-content"] header,main[role="main-inner-wrapper"] article[role="pge-title-content"] header{ padding-bottom:19px; padding-top:83px}
 
 main[role="main-home-wrapper"] article[role="pge-title-content"] header h2,main[role="main-inner-wrapper"] article[role="pge-title-content"] header h2{ font-size:46px; line-height:53px; color:#404040; font-weight:800}
-
-main[role="main-home-wrapper"] article[role="pge-title-content"] header h2 span,main[role="main-inner-wrapper"] article[role="pge-title-content"] header h2 span{ display:block; font-size:80px; color:#fb5353; padding-bottom:15px}
+/* タイトルカラーラベル修正 */
+main[role="main-home-wrapper"] article[role="pge-title-content"] header h3 span,main[role="main-inner-wrapper"] article[role="pge-title-content"] header h3 span{ display:block; font-size:56px; color:#fb5353; padding-bottom:15px}
 
 main[role="main-home-wrapper"] article[role="pge-title-content"] p,main[role="main-inner-wrapper"] article[role="pge-title-content"] p{ font-size:20px; line-height:30px; color:#454545}
 
@@ -399,4 +399,3 @@ article[role="pge-title-content"].contact-header p a:hover{color:#fb5353; text-d
 .commentys-form input[type="button"]{ padding:0 36px; text-transform:uppercase; display:inline-block; font-size:21px; line-height:60px; color:#FFF; font-weight: bold; text-align:center; border:none; outline:none; background-color:#fb5353; margin-top:50px}
 
 .commentys-form input[type="button"]:hover{ background-color:#ff5c5c}
-
