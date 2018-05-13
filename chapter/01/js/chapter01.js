@@ -19,6 +19,11 @@ function init() {
   const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
   camera.position.set(0, 0, +1000);
 
+  // カメラコントローラーを作成
+  const controls = new THREE.OrbitControls(camera);
+  controls.target.set(0, 0, 32);
+  controls.update();
+
   // 箱を作成
   const geometry = new THREE.BoxGeometry(100, 100, 100);
   const material = new THREE.MeshStandardMaterial({color: 0xAAAAAA});
