@@ -18,11 +18,11 @@ function init() {
 
   // カメラを作成
   const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-  camera.position.set(0, 150, 300);
+  camera.position.set(0, 150, 150);
 
   // カメラコントローラーを作成
   const controls = new THREE.OrbitControls(camera);
-  controls.target.set(0, 24, 32);
+  controls.target.set(0, 32, 32);
   controls.update();
 
   // 平行光源
