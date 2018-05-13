@@ -1,5 +1,5 @@
-window.addEventListener('DOMContentLoaded', init);
-// window.addEventListener('load', init);
+// window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('load', init);
 
 function init() {
   const width = 960;
@@ -18,11 +18,11 @@ function init() {
 
   // カメラを作成
   const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-  camera.position.set(0, 0, 10);
+  camera.position.set(0, 50, 100);
 
   // カメラコントローラーを作成
   const controls = new THREE.OrbitControls(camera);
-  controls.target.set(0, 0, 3);
+  controls.target.set(0, 0, 18);
   controls.update();
 
   // 平行光源
@@ -33,8 +33,8 @@ function init() {
   scene.add(light);
 
   // 環境光を追加
-  const ambientLight = new THREE.AmbientLight(0x33DD33);
-  scene.add(ambientLight);
+  // const ambientLight = new THREE.AmbientLight(0x33DD33);
+  // scene.add(ambientLight);
 
   //
   const loader = new THREE.ColladaLoader();
