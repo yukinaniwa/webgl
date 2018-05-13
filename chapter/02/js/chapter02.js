@@ -1,5 +1,5 @@
-// window.addEventListener('DOMContentLoaded', init);
-window.addEventListener('load', init);
+window.addEventListener('DOMContentLoaded', init);
+// window.addEventListener('load', init);
 
 function init() {
   const width = 960;
@@ -14,7 +14,7 @@ function init() {
 
   // シーンを作成
   const scene = new THREE.Scene();
-  // scene.background = new THREE.Color( 0x333333 );
+  scene.background = new THREE.Color( 0x333333 );
 
   // カメラを作成
   const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
@@ -33,14 +33,13 @@ function init() {
   scene.add(light);
 
   // 環境光を追加
-  const ambientLight = new THREE.AmbientLight(0x333333);
-  scene.add(ambientLight);
+  // const ambientLight = new THREE.AmbientLight(0x333333);
+  // scene.add(ambientLight);
 
   //
   const loader = new THREE.ColladaLoader();
-  loader.load('../models/elf/elf.dae', (collada) => {
+  loader.load('../models/eyeball/eyeball.dae', (collada) => {
     const model = collada.scene;
-    scene.background = new THREE.Color( 0xFF0000 );
     scene.add(model);
   });
 
