@@ -1,4 +1,5 @@
-window.addEventListener('DOMContentLoaded', init);
+// window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('load', init);
 
 function init() {
   const width = 960;
@@ -17,13 +18,15 @@ function init() {
 
   // カメラを作成
   const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-  camera.position.set(0, 0, +1000);
+  camera.position.set(0, 10, 10);
 
-  // 箱を作成
-  const geometry = new THREE.BoxGeometry(100, 100, 100);
-  const material = new THREE.MeshStandardMaterial({color: 0xAAAAAA});
-  const box = new THREE.Mesh(geometry, material);
-  scene.add(box);
+  //
+  const loader = new THREE.ColladaLoader();
+  loader.load('../models/elf/elf/elf.dae', (collada) => {
+    const model = collada.scene;
+    scene.background = new THREE.Color( 0xFF0000 );
+    scene.add(model);
+  });
 
   // 平行光源
   const light = new THREE.DirectionalLight(0xFFFFFF);
@@ -39,8 +42,8 @@ function init() {
     requestAnimationFrame(tick);
 
     // 箱を回転させる
-    box.rotation.x += 0.01;
-    box.rotation.y += 0.01;
+    // box.rotation.x += 0.01;
+    // box.rotation.y += 0.01;
 
     // レンダリング
     renderer.render(scene, camera);
