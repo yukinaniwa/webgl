@@ -20,13 +20,10 @@ function init() {
   const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
   camera.position.set(0, 10, 10);
 
-  //
-  const loader = new THREE.ColladaLoader();
-  loader.load('../models/elf/elf/elf.dae', (collada) => {
-    const model = collada.scene;
-    scene.background = new THREE.Color( 0xFF0000 );
-    scene.add(model);
-  });
+  // カメラコントローラーを作成
+  const controls = new THREE.OrbitControls(camera);
+  controls.target.set(0, 3, 0);
+  controls.update();
 
   // 平行光源
   const light = new THREE.DirectionalLight(0xFFFFFF);
@@ -35,17 +32,22 @@ function init() {
   // シーンに追加
   scene.add(light);
 
-  // 初回実行
+  // 環境光を追加
+  const ambientLight = new THREE.AmbientLight(0x333333);
+  scene.add(ambientLight);
+
+  //
+  const loader = new THREE.ColladaLoader();
+  loader.load('../models/elf/elf/elf.dae', (collada) => {
+    const model = collada.scene;
+    scene.background = new THREE.Color( 0xFF0000 );
+    scene.add(model);
+  });
+
   tick();
 
   function tick() {
-    requestAnimationFrame(tick);
-
-    // 箱を回転させる
-    // box.rotation.x += 0.01;
-    // box.rotation.y += 0.01;
-
-    // レンダリング
     renderer.render(scene, camera);
+    requestAnimationFrame(tick);
   }
 }
