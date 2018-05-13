@@ -38,7 +38,7 @@ function init() {
 
   //
   const loader = new THREE.ColladaLoader();
-  loader.load('../models/elf/elf/elf.dae', (collada) => {
+  loader.load('../models/elf/elf.dae', (collada) => {
     const model = collada.scene;
     scene.background = new THREE.Color( 0xFF0000 );
     scene.add(model);
