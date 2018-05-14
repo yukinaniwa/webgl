@@ -12,6 +12,7 @@ function initRenderer(width, height) {
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height);
+  renderer.shadowMapEnabled = true;
 
   return renderer;
 }
@@ -49,10 +50,22 @@ function initCamera(width, height, x, y, z) {
 
 /**
 */
-function initCameraControls(camera, x, y, z) {
-  const controls = new THREE.OrbitControls(camera);
+function initCameraControls(renderer, camera, x, y, z) {
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.target.set(x, y, z);
   controls.update();
 
   return controls;
+}
+
+/**
+*/
+function attachFpsView() {
+  const stats = new Stats();
+  stats.domElement.style.position = 'absolute';
+  stats.domElement.style.top = '8px';
+  stats.domElement.style.zIndex = 128;
+  document.body.appendChild(stats.domElement);
+
+  return stats
 }

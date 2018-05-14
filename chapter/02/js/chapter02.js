@@ -25,6 +25,8 @@ function init() {
   controls.target.set(0, 32, 32);
   controls.update();
 
+  const stats = attachFpsView()
+
   // 平行光源
   const light = new THREE.DirectionalLight(0xFFFFFF);
   // light.intensity = 1;
@@ -46,7 +48,9 @@ function init() {
   tick();
 
   function tick() {
-    renderer.render(scene, camera);
     requestAnimationFrame(tick);
+    
+    renderer.render(scene, camera);
+    stats.update();
   }
 }

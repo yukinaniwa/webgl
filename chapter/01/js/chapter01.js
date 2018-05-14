@@ -8,7 +8,8 @@ function init() {
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
   const camera = initCamera(width, height, 0, 0, +1000);
-  const controls = initCameraControls(camera, 0, 0, 32);
+  initCameraControls(renderer, camera, 0, 0, 32);
+  const stats = attachFpsView()
 
   // models
   const geometry = new THREE.BoxGeometry(100, 100, 100);
@@ -21,15 +22,23 @@ function init() {
   light.position.set(1, 1, 1);
   scene.add(light);
 
+  // GUI
+  var controls = new function () {
+      this.rotationSpeed = 0.01;
+  };
+  var gui = new dat.GUI();
+  gui.add(controls, 'rotationSpeed', 0, 0.1);
+
   tick();
 
   function tick() {
     requestAnimationFrame(tick);
 
     // rotation box
-    box.rotation.x += 0.01;
-    box.rotation.y += 0.01;
+    box.rotation.x += controls.rotationSpeed;
+    box.rotation.y += controls.rotationSpeed;
 
     renderer.render(scene, camera);
+    stats.update();
   }
 }
