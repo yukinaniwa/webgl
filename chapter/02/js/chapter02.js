@@ -14,7 +14,7 @@ function init() {
   // 平行光源
   const light = new THREE.DirectionalLight(0xFFFFFF);
   light.intensity = 1.6;
-  light.position.set(1, 1, -1);
+  light.position.set(1, 1, 1);
   // シーンに追加
   scene.add(light);
 
@@ -24,7 +24,7 @@ function init() {
 
   // COLLADA
   const loader = new THREE.ColladaLoader();
-  loader.load('../models/CBdragon.dae', (collada) => {
+  loader.load('../models/dragon.dae', (collada) => {
     const model = collada.scene;
     model.scale.set(128,128,128);
     scene.add(model);
