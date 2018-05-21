@@ -5,32 +5,16 @@ function init() {
   const width = 960;
   const height = 540;
 
-  // レンダラーを作成
-  const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('#GLCanvas')
-  });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(width, height);
-
-  // シーンを作成
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color( 0x333333 );
-
-  // カメラを作成
-  const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-  camera.position.set(0, 150, 150);
-
-  // カメラコントローラーを作成
-  const controls = new THREE.OrbitControls(camera);
-  controls.target.set(0, 32, 32);
-  controls.update();
-
+  const renderer = initRenderer(width, height);
+  const scene = initScene(width, height);
+  const camera = initCamera(width, height, 0, 100, -256);
+  initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
   // 平行光源
   const light = new THREE.DirectionalLight(0xFFFFFF);
-  // light.intensity = 1;
-  light.position.set(1, 1, 1);
+  light.intensity = 1.6;
+  light.position.set(1, 1, -1);
   // シーンに追加
   scene.add(light);
 
@@ -38,10 +22,11 @@ function init() {
   // const ambientLight = new THREE.AmbientLight(0x33DD33);
   // scene.add(ambientLight);
 
-  //
+  // COLLADA
   const loader = new THREE.ColladaLoader();
-  loader.load('../models/boletus/boletus.dae', (collada) => {
+  loader.load('../models/CBdragon.dae', (collada) => {
     const model = collada.scene;
+    model.scale.set(128,128,128);
     scene.add(model);
   });
 
@@ -49,7 +34,7 @@ function init() {
 
   function tick() {
     requestAnimationFrame(tick);
-    
+
     renderer.render(scene, camera);
     stats.update();
   }
