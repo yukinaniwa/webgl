@@ -11,6 +11,18 @@ function init() {
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
+  var cubeTexture = new THREE.CubeTextureLoader()
+  	.setPath('../textures/cubemap/')
+  	.load( [
+  		'posx.jpg',
+  		'negx.jpg',
+  		'posy.jpg',
+  		'negy.jpg',
+  		'posz.jpg',
+  		'negz.jpg'
+  	] );
+  scene.background = cubeTexture;
+  
   // 平行光源
   const light = new THREE.DirectionalLight(0xFFFFFF);
   light.intensity = 1.6;
