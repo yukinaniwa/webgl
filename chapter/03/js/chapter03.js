@@ -7,7 +7,7 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 100, -512);
+  const camera = initCamera(width, height, 0, 100, -880);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
