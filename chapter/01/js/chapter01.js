@@ -7,36 +7,40 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 0, +1000);
-  initCameraControls(renderer, camera, 0, 0, 32);
+  const camera = initCamera(width, height, 0, 100, -468);
+  initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
-  // models
-  const geometry = new THREE.BoxGeometry(100, 100, 100);
-  const material = new THREE.MeshStandardMaterial({color: 0xAAAAAA});
-  const box = new THREE.Mesh(geometry, material);
-  scene.add(box);
+  var cubeTexture = new THREE.CubeTextureLoader()
+  	.setPath('../textures/cubemap/')
+  	.load( [
+  		'posx.jpg',
+  		'negx.jpg',
+  		'posy.jpg',
+  		'negy.jpg',
+  		'posz.jpg',
+  		'negz.jpg'
+  	] );
+  scene.background = cubeTexture;
 
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
-  light.position.set(1, 1, 1);
+  light.intensity = 1.0;
+  light.position.set(1, 1, -1);
   scene.add(light);
 
-  // GUI
-  var controls = new function () {
-      this.rotationSpeed = 0.01;
-  };
-  var gui = new dat.GUI();
-  gui.add(controls, 'rotationSpeed', 0, 0.1);
+  // COLLADA
+  const loader = new THREE.ColladaLoader();
+  loader.load('../models/bunny.dae', (collada) => {
+    const model = collada.scene;
+    model.scale.set(128,128,128);
+    scene.add(model);
+  });
 
   tick();
 
   function tick() {
     requestAnimationFrame(tick);
-
-    // rotation box
-    box.rotation.x += controls.rotationSpeed;
-    box.rotation.y += controls.rotationSpeed;
 
     renderer.render(scene, camera);
     stats.update();

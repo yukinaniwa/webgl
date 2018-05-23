@@ -7,7 +7,7 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 100, -256);
+  const camera = initCamera(width, height, 0, 100, -468);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
@@ -22,16 +22,15 @@ function init() {
   		'negz.jpg'
   	] );
   scene.background = cubeTexture;
-  
-  // 平行光源
+
+  // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
-  light.intensity = 1.6;
-  light.position.set(1, 1, 1);
-  // シーンに追加
+  light.intensity = 1.0;
+  light.position.set(1, 1, -1);
   scene.add(light);
 
   // 環境光を追加
-  // const ambientLight = new THREE.AmbientLight(0x33DD33);
+  // const ambientLight = new THREE.AmbientLight(0xFFFFFF);
   // scene.add(ambientLight);
 
   // COLLADA
