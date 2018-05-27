@@ -1,3 +1,5 @@
+// https://qiita.com/_nabe/items/1657d9556591284a43c8
+
 // window.addEventListener('DOMContentLoaded', init);
 window.addEventListener('load', init);
 
@@ -7,7 +9,7 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 100, -468);
+  const camera = initCamera(width, height, 0, 100, -400);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
@@ -23,6 +25,13 @@ function init() {
   	] );
   scene.background = cubeTexture;
 
+  // GUI
+  var controls = new function () {
+      this.isHalfLambert = false;
+  };
+  var gui = new dat.GUI( { autoPlace: true } );
+  gui.add(controls, 'isHalfLambert', true);
+
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
   light.intensity = 1.0;
@@ -30,33 +39,46 @@ function init() {
   scene.add(light);
 
   // SHADER
-  let material = new THREE.ShaderMaterial({
-    vertexShader: loadShaderFile("shader/vertexshader.js"),
-    fragmentShader: loadShaderFile("shader/fragmentshader.js"),
+  let materialLambert = new THREE.ShaderMaterial({
+    vertexShader: loadShaderFile("shader/vertex.vsh"),
+    fragmentShader: loadShaderFile("shader/lambert.fsh"),
     uniforms:{
-      uColor: {type: "c", value: new THREE.Color(0xFF0000)}
-    }
+      lightPos: {type: "v3", value: light.position},
+    },
+  });
+
+  let materialHalfLambert = new THREE.ShaderMaterial({
+    vertexShader: loadShaderFile("shader/vertex.vsh"),
+    fragmentShader: loadShaderFile("shader/half_lambert.fsh"),
+    uniforms:{
+      lightPos: {type: "v3", value: light.position},
+    },
   });
 
   // COLLADA
   const loader = new THREE.ColladaLoader();
+  var colladaModel;
   loader.load('../models/dragon.dae', (collada) => {
-    const model = collada.scene;
-    model.scale.set(128,128,128);
-    model.children.forEach(function(childModel) {
-      childModel.material = material;
-    });
+    colladaModel = collada.scene;
+    colladaModel.scale.set(128,128,128);
 
-    console.log("model.children");
-    console.log(model.children);
-
-    scene.add(model);
+    scene.add(colladaModel);
   });
 
   tick();
 
   function tick() {
     requestAnimationFrame(tick);
+
+    if( !controls.isHalfLambert ) {
+      colladaModel.children.forEach(function(childModel) {
+        childModel.material = materialLambert;
+      });
+    } else {
+      colladaModel.children.forEach(function(childModel) {
+        childModel.material = materialHalfLambert;
+      });
+    }
 
     renderer.render(scene, camera);
     stats.update();
