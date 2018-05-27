@@ -14,7 +14,7 @@ varying vec2 vUv;                // テクスチャを貼るためのUV座標
 uniform vec3 lightPos;
 
 void main() {
-  vec3 lightVector = normalize(lightPos - vPosition);
+  vec3 lightVector = normalize(vPosition - lightPos);
   float lambert = dot(lightVector, vNormal);
 
   gl_FragColor = vec4(vec3(lambert), 1.0);
