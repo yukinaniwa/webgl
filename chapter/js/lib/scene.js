@@ -49,6 +49,7 @@ function initCamera(width, height, x, y, z) {
 }
 
 /**
+  デバッグ、マウスなどのコントロールを取得できるように
 */
 function initCameraControls(renderer, camera, x, y, z) {
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -59,6 +60,7 @@ function initCameraControls(renderer, camera, x, y, z) {
 }
 
 /**
+  デバッグ、FPS を表示する
 */
 function attachFpsView() {
   const stats = new Stats();

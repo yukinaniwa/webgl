@@ -29,15 +29,27 @@ function init() {
   light.position.set(1, 1, -1);
   scene.add(light);
 
-  // 環境光を追加
-  // const ambientLight = new THREE.AmbientLight(0xFFFFFF);
-  // scene.add(ambientLight);
+  // SHADER
+  let material = new THREE.ShaderMaterial({
+    vertexShader: loadShaderFile("shader/vertexshader.js"),
+    fragmentShader: loadShaderFile("shader/fragmentshader.js"),
+    uniforms:{
+      uColor: {type: "c", value: new THREE.Color(0xFF0000)}
+    }
+  });
 
   // COLLADA
   const loader = new THREE.ColladaLoader();
   loader.load('../models/dragon.dae', (collada) => {
     const model = collada.scene;
     model.scale.set(128,128,128);
+    model.children.forEach(function(childModel) {
+      childModel.material = material;
+    });
+
+    console.log("model.children");
+    console.log(model.children);
+
     scene.add(model);
   });
 
