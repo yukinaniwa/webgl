@@ -7,7 +7,7 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 100, -880);
+  const camera = initCamera(width, height, 0, 100, -400);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
@@ -30,18 +30,26 @@ function init() {
   // シーンに追加
   scene.add(light);
 
-  // 環境光を追加
-  const ambientLight = new THREE.AmbientLight(0xFFFFFF);
-  scene.add(ambientLight);
-
-  var geometry = new THREE.SphereGeometry( 100, 300, 300);
   var material = new THREE.MeshPhongMaterial({
-  	color: 0x868686,
+  	color: 0xFFFFFF,
   	envMap: cubeTexture,
-  	reflectivity: 0.8
+  	reflectivity: 1.0
   });
-  mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
+
+  // COLLADA
+  const loader = new THREE.ColladaLoader();
+  var colladaModel;
+  loader.load('../models/CoffeeCup.dae', (collada) => {
+    colladaModel = collada.scene;
+    colladaModel.scale.set(60,60,60);
+    colladaModel.rotation.set( -86 * Math.PI / 180, 0, 0 );
+    colladaModel.position.set(0,0,0);
+
+    colladaModel.children.forEach(function(childModel) {
+      childModel.material = material;
+    });
+    scene.add(colladaModel);
+  });
 
   tick();
 

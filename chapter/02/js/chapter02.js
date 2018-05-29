@@ -33,7 +33,18 @@ function init() {
       this.isHalfLambert = false;
   };
   var gui = new dat.GUI( { autoPlace: true } );
-  gui.add(controls, 'isHalfLambert', true);
+  gui.add(controls, 'isHalfLambert', true).onChange(setIsHalfLambert);
+  function setIsHalfLambert() {
+    if( !controls.isHalfLambert ) {
+      colladaModel.children.forEach(function(childModel) {
+        childModel.material = materialLambert;
+      });
+    } else {
+      colladaModel.children.forEach(function(childModel) {
+        childModel.material = materialHalfLambert;
+      });
+    }
+  }
 
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
@@ -71,6 +82,9 @@ function init() {
   loader.load('../models/dragon.dae', (collada) => {
     colladaModel = collada.scene;
     colladaModel.scale.set(128,128,128);
+    colladaModel.children.forEach(function(childModel) {
+      childModel.material = materialLambert;
+    });
 
     scene.add(colladaModel);
   });
@@ -97,17 +111,7 @@ function init() {
 
     // 光源の位置に設定
     sphereMesh.position.set(vLightPosition.x,vLightPosition.y,vLightPosition.z);
-
-    if( !controls.isHalfLambert ) {
-      colladaModel.children.forEach(function(childModel) {
-        childModel.material = materialLambert;
-      });
-    } else {
-      colladaModel.children.forEach(function(childModel) {
-        childModel.material = materialHalfLambert;
-      });
-    }
-
+    
     renderer.render(scene, camera);
     stats.update();
   }

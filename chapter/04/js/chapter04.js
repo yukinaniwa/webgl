@@ -69,6 +69,9 @@ function init() {
     colladaModel.scale.set(128,128,128);
     colladaModel.position.set(0,0,0);
 
+    colladaModel.children.forEach(function(childModel) {
+      childModel.material = rimLighting;
+    });
     scene.add(colladaModel);
   });
 
@@ -98,11 +101,6 @@ function init() {
 
     // 光源の位置に設定
     sphereMesh.position.set(vLightPosition.x,vLightPosition.y,vLightPosition.z);
-
-    // RIM
-    colladaModel.children.forEach(function(childModel) {
-      childModel.material = rimLighting;
-    });
 
     renderer.render(scene, camera);
     stats.update();
