@@ -33,7 +33,7 @@ function init() {
   var material = new THREE.MeshPhongMaterial({
   	color: 0xFFFFFF,
   	envMap: cubeTexture,
-  	reflectivity: 1.0
+  	reflectivity: 0.64
   });
 
   // COLLADA
