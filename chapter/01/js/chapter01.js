@@ -7,33 +7,24 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 100, -468);
+  const camera = initCamera(width, height, 0, 100, 468);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
-  var cubeTexture = new THREE.CubeTextureLoader()
-  	.setPath('../textures/cubemap/')
-  	.load( [
-  		'posx.jpg',
-  		'negx.jpg',
-  		'posy.jpg',
-  		'negy.jpg',
-  		'posz.jpg',
-  		'negz.jpg'
-  	] );
-  scene.background = cubeTexture;
-
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
-  light.intensity = 1.0;
-  light.position.set(1, 1, -1);
+  light.intensity = 0.33;
+  light.position.set(1, 1, 1);
   scene.add(light);
 
   // COLLADA
   const loader = new THREE.ColladaLoader();
-  loader.load('../models/bunny.dae', (collada) => {
+  loader.load('../models/Jesus_Statue.dae', (collada) => {
     const model = collada.scene;
-    model.scale.set(128,128,128);
+    model.scale.set(60,60,60);
+    model.rotation.set( -90 * Math.PI / 180, 0, 0 );
+    model.position.set(0,-130,0);
+
     scene.add(model);
   });
 

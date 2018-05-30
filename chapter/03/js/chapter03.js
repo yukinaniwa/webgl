@@ -7,7 +7,7 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 100, -400);
+  const camera = initCamera(width, height, 0, 100, 400);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
@@ -26,24 +26,24 @@ function init() {
   // 平行光源
   const light = new THREE.DirectionalLight(0xFFFFFF);
   light.intensity = 1.0;
-  light.position.set(0, 1, -1);
+  light.position.set(0, 1, 1);
   // シーンに追加
   scene.add(light);
 
   var material = new THREE.MeshPhongMaterial({
   	color: 0xFFFFFF,
   	envMap: cubeTexture,
-  	reflectivity: 0.64
+  	reflectivity: 0.86
   });
 
   // COLLADA
   const loader = new THREE.ColladaLoader();
   var colladaModel;
-  loader.load('../models/CoffeeCup.dae', (collada) => {
+  loader.load('../models/Jesus_Statue.dae', (collada) => {
     colladaModel = collada.scene;
     colladaModel.scale.set(60,60,60);
-    colladaModel.rotation.set( -86 * Math.PI / 180, 0, 0 );
-    colladaModel.position.set(0,0,0);
+    colladaModel.rotation.set( -90 * Math.PI / 180, 0, 0 );
+    colladaModel.position.set(0,-130,0);
 
     colladaModel.children.forEach(function(childModel) {
       childModel.material = material;

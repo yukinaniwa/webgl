@@ -30,10 +30,10 @@ function init() {
 
   // GUI
   var controls = new function () {
-      this.power = 2.0;
+      this.power = 4.0;
   };
   var gui = new dat.GUI( { autoPlace: true } );
-  gui.add(controls, 'power', 0.5, 4.0);
+  gui.add(controls, 'power', 0.5, 8.0);
 
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
