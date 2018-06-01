@@ -41,6 +41,9 @@ function init() {
   light.position.set(1, 3, 2);
   scene.add(light);
 
+  const ambientLight = new THREE.AmbientLight(0xFFFFFF);
+  scene.add(ambientLight);
+
   // 光源位置に配置する
   var sphereMesh = new THREE.Mesh(new THREE.SphereGeometry( 8, 64, 64), new THREE.MeshPhongMaterial({
     color: 0xFDB813

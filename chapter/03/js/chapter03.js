@@ -30,10 +30,13 @@ function init() {
   // シーンに追加
   scene.add(light);
 
+  const ambientLight = new THREE.AmbientLight(0xFFFFFF);
+  scene.add(ambientLight);
+
   var material = new THREE.MeshPhongMaterial({
   	color: 0xFFFFFF,
   	envMap: cubeTexture,
-  	reflectivity: 0.86
+  	reflectivity: 0.98
   });
 
   // COLLADA

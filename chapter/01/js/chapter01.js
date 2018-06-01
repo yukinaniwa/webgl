@@ -17,6 +17,9 @@ function init() {
   light.position.set(1, 1, 1);
   scene.add(light);
 
+  const ambientLight = new THREE.AmbientLight(0xFFFFFF);
+  scene.add(ambientLight);
+
   // COLLADA
   const loader = new THREE.ColladaLoader();
   loader.load('../models/Jesus_Statue.dae', (collada) => {
