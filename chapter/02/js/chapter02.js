@@ -4,8 +4,8 @@
 window.addEventListener('load', init);
 
 function init() {
-  const width = 960;
-  const height = 540;
+  const width = screen.width;
+  const height = screen.height;
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
@@ -111,7 +111,7 @@ function init() {
 
     // 光源の位置に設定
     sphereMesh.position.set(vLightPosition.x,vLightPosition.y,vLightPosition.z);
-    
+
     renderer.render(scene, camera);
     stats.update();
   }
