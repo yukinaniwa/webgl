@@ -6,7 +6,7 @@ window.addEventListener('load', init);
 function init() {
   const width = 960;
   const height = 540;
-  
+
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
   const camera = initCamera(width, height, 0, 100, -400);
@@ -30,18 +30,20 @@ function init() {
 
   // GUI
   var controls = new function () {
-      this.isHalfLambert = false;
+      this.isBlinnPhong = false;
+      this.power = 4.0;
   };
   var gui = new dat.GUI( { autoPlace: true } );
-  gui.add(controls, 'isHalfLambert', true).onChange(setIsHalfLambert);
+  gui.add(controls, 'power', 0.5, 16.0);
+  gui.add(controls, 'isBlinnPhong', true).onChange(setIsHalfLambert);
   function setIsHalfLambert() {
-    if( !controls.isHalfLambert ) {
+    if( !controls.isBlinnPhong ) {
       colladaModel.children.forEach(function(childModel) {
-        childModel.material = materialLambert;
+        childModel.material = materialPhong;
       });
     } else {
       colladaModel.children.forEach(function(childModel) {
-        childModel.material = materialHalfLambert;
+        childModel.material = materialBlinnPhong;
       });
     }
   }
@@ -59,20 +61,25 @@ function init() {
   scene.add(sphereMesh);
 
   // SHADER
+  var vSpecularPower = new THREE.Vector3();
   var vLightPosition = new THREE.Vector3();
-  let materialLambert = new THREE.ShaderMaterial({
+  let materialPhong = new THREE.ShaderMaterial({
     vertexShader: loadShaderFile("shader/vertex.vsh"),
-    fragmentShader: loadShaderFile("shader/lambert.fsh"),
+    fragmentShader: loadShaderFile("shader/phong.fsh"),
     uniforms:{
       lightPos: {type: "v3", value: vLightPosition},
+      cameraPos: {type: "v3", value: camera.position},
+      specularPower: {type: "v3", value: vSpecularPower},
     },
   });
 
-  let materialHalfLambert = new THREE.ShaderMaterial({
+  let materialBlinnPhong = new THREE.ShaderMaterial({
     vertexShader: loadShaderFile("shader/vertex.vsh"),
-    fragmentShader: loadShaderFile("shader/half_lambert.fsh"),
+    fragmentShader: loadShaderFile("shader/blinn_phong.fsh"),
     uniforms:{
       lightPos: {type: "v3", value: vLightPosition},
+      cameraPos: {type: "v3", value: camera.position},
+      specularPower: {type: "v3", value: vSpecularPower},
     },
   });
 
@@ -83,7 +90,7 @@ function init() {
     colladaModel = collada.scene;
     colladaModel.scale.set(128,128,128);
     colladaModel.children.forEach(function(childModel) {
-      childModel.material = materialLambert;
+      childModel.material = materialPhong;
     });
 
     scene.add(colladaModel);
@@ -111,6 +118,9 @@ function init() {
 
     // 光源の位置に設定
     sphereMesh.position.set(vLightPosition.x,vLightPosition.y,vLightPosition.z);
+
+    //
+    vSpecularPower.set(controls.power,controls.power,controls.power);
 
     renderer.render(scene, camera);
     stats.update();

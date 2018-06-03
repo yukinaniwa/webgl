@@ -13,15 +13,19 @@ varying vec2 vUv;                // テクスチャを貼るためのUV座標
 // uniforms 外から定義して送るもの
 uniform vec3 lightPos;
 uniform vec3 cameraPos;
-uniform vec3 rimPower;
+uniform vec3 specularPower;
 
 void main() {
   vec3 eyeVector = normalize(cameraPos - vPosition);
   vec3 lightVector = normalize(vPosition - lightPos);
-  //float half_lambert = dot(lightVector, vNormal) * 0.5 * 0.5;
 
-  float rim = (dot(vNormal, eyeVector));
-  vec3 rimColor = vec3(1.0 - rimPower.x * (rim*rim*rim*rim));
+  float NdotL = max(0.0, dot(vNormal, lightVector));
+  // R = L + 2 * N * (N ・L)
+  // H=(ViewDir + L)/|ViewDir+L|
+  vec3 R = (eyeVector + lightVector) / eyeVector + lightVector;
+  float spec = pow(max(0.0, dot(R, eyeVector)), specularPower.x);
 
-  gl_FragColor = vec4(vec3(0.32, 0.68, 0.43)+rimColor, 1.0);
+  vec3 phong = NdotL + spec + vec3(0.1, 0.1, 0.1);
+
+  gl_FragColor = vec4(phong, 1.0);
 }

@@ -1,3 +1,4 @@
+// https://qiita.com/_nabe/items/1657d9556591284a43c8
 
 // varying: fragment shader に送るもの
 // viewMatrix と cameraPosition 送らなくても fsh で使える
@@ -10,18 +11,9 @@ varying vec3 vPosition;          // 頂点座標
 varying vec3 vNormal;            // 頂点法線ベクトル
 varying vec2 vUv;                // テクスチャを貼るためのUV座標
 
-// uniforms 外から定義して送るもの
-uniform vec3 lightPos;
-uniform vec3 cameraPos;
-uniform vec3 rimPower;
-
 void main() {
-  vec3 eyeVector = normalize(cameraPos - vPosition);
-  vec3 lightVector = normalize(vPosition - lightPos);
-  //float half_lambert = dot(lightVector, vNormal) * 0.5 * 0.5;
+  vNormal = normal;
+  vProjectionMatrix = projectionMatrix;
 
-  float rim = (dot(vNormal, eyeVector));
-  vec3 rimColor = vec3(1.0 - rimPower.x * (rim*rim*rim*rim));
-
-  gl_FragColor = vec4(vec3(0.32, 0.68, 0.43)+rimColor, 1.0);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
