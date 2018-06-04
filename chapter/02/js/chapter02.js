@@ -6,7 +6,7 @@ window.addEventListener('load', init);
 function init() {
   const width = 960;
   const height = 540;
-  
+
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
   const camera = initCamera(width, height, 0, 100, -400);
@@ -30,9 +30,11 @@ function init() {
 
   // GUI
   var controls = new function () {
+      this.lightspeed = 1
       this.isHalfLambert = false;
   };
   var gui = new dat.GUI( { autoPlace: true } );
+  gui.add(controls, 'lightspeed', 0.0, 6.0);
   gui.add(controls, 'isHalfLambert', true).onChange(setIsHalfLambert);
   function setIsHalfLambert() {
     if( !controls.isHalfLambert ) {
@@ -94,7 +96,7 @@ function init() {
   function tick() {
     requestAnimationFrame(tick);
 
-    progress_timer += 0.016;
+    progress_timer += (0.016*controls.lightspeed);
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();

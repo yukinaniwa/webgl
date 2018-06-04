@@ -30,10 +30,12 @@ function init() {
 
   // GUI
   var controls = new function () {
+      this.lightspeed = 1
       this.isBlinnPhong = false;
       this.power = 4.0;
   };
   var gui = new dat.GUI( { autoPlace: true } );
+  gui.add(controls, 'lightspeed', 0.0, 6.0);
   gui.add(controls, 'power', 0.5, 16.0);
   gui.add(controls, 'isBlinnPhong', true).onChange(setIsHalfLambert);
   function setIsHalfLambert() {
@@ -101,7 +103,7 @@ function init() {
   function tick() {
     requestAnimationFrame(tick);
 
-    progress_timer += 0.016;
+    progress_timer += (0.016*controls.lightspeed);
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
