@@ -18,10 +18,9 @@ uniform vec3 rimPower;
 void main() {
   vec3 eyeVector = normalize(cameraPos - vPosition);
   vec3 lightVector = normalize(vPosition - lightPos);
-  //float half_lambert = dot(lightVector, vNormal) * 0.5 * 0.5;
 
   float rim = (dot(vNormal, eyeVector));
   vec3 rimColor = vec3(1.0 - rimPower.x * (rim*rim*rim*rim));
 
-  gl_FragColor = vec4(vec3(0.32, 0.68, 0.43)+rimColor, 1.0);
+  gl_FragColor = vec4(vec3(0.56, 0.58, 0.28)+rimColor, 1.0);
 }
