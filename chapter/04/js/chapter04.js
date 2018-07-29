@@ -4,8 +4,8 @@
 window.addEventListener('load', init);
 
 function init() {
-  const width = 960;
-  const height = 540;
+  const width = window.parent.screen.width;
+  const height = window.parent.screen.height;
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
