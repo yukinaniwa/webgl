@@ -42,7 +42,7 @@ function initScene(width, height) {
   @return camera
 */
 function initCamera(width, height, x, y, z) {
-  const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+  const camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000000);
   camera.position.set(x, y, z);
 
   return camera;

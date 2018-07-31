@@ -9,7 +9,7 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 100, -400);
+  const camera = initCamera(width, height, 0, 200, -400);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
@@ -30,25 +30,10 @@ function init() {
 
   // GUI
   var controls = new function () {
-      this.lightspeed = 1
-      this.isBlinnPhong = false;
-      this.power = 4.0;
+      this.lightspeed = 1;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
-  gui.add(controls, 'power', 0.5, 16.0);
-  gui.add(controls, 'isBlinnPhong', true).onChange(setIsHalfLambert);
-  function setIsHalfLambert() {
-    if( !controls.isBlinnPhong ) {
-      colladaModel.children.forEach(function(childModel) {
-        childModel.material = materialPhong;
-      });
-    } else {
-      colladaModel.children.forEach(function(childModel) {
-        childModel.material = materialBlinnPhong;
-      });
-    }
-  }
 
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
@@ -57,47 +42,23 @@ function init() {
   scene.add(light);
 
   // 光源位置に配置する
-  var sphereMesh = new THREE.Mesh(new THREE.SphereGeometry( 8, 64, 64), new THREE.MeshPhongMaterial({
+  var sphereMesh = new THREE.Mesh(new THREE.SphereGeometry(768), new THREE.MeshPhongMaterial({
     color: 0xFDB813
   }));
   scene.add(sphereMesh);
 
   // SHADER
-  var vSpecularPower = new THREE.Vector3();
   var vLightPosition = new THREE.Vector3();
-  let materialPhong = new THREE.ShaderMaterial({
-    vertexShader: loadShaderFile("shader/vertex.vsh"),
-    fragmentShader: loadShaderFile("shader/phong.fsh"),
-    uniforms:{
-      lightPos: {type: "v3", value: vLightPosition},
-      cameraPos: {type: "v3", value: camera.position},
-      specularPower: {type: "v3", value: vSpecularPower},
-    },
-  });
 
-  let materialBlinnPhong = new THREE.ShaderMaterial({
-    vertexShader: loadShaderFile("shader/vertex.vsh"),
-    fragmentShader: loadShaderFile("shader/blinn_phong.fsh"),
-    uniforms:{
-      lightPos: {type: "v3", value: vLightPosition},
-      cameraPos: {type: "v3", value: camera.position},
-      specularPower: {type: "v3", value: vSpecularPower},
-    },
-  });
+  //
+  var geometry = new THREE.PlaneGeometry( 100000, 100000, 256 );
+  var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide, wireframe: true} );
+  var plane = new THREE.Mesh( geometry, material );
+  scene.add( plane );
+  plane.position.y = -500;
+  plane.rotation.x = Math.PI/2;
 
-  // COLLADA
-  const loader = new THREE.ColladaLoader();
-  var colladaModel;
-  loader.load('../models/dragon.dae', (collada) => {
-    colladaModel = collada.scene;
-    colladaModel.scale.set(128,128,128);
-    colladaModel.children.forEach(function(childModel) {
-      childModel.material = materialPhong;
-    });
-
-    scene.add(colladaModel);
-  });
-
+  //
   tick();
 
   function tick() {
@@ -107,7 +68,7 @@ function init() {
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
-    mTrans.makeTranslation(320, 220, 0);
+    mTrans.makeTranslation(60000, 30000, 0);
 
     // 回転行列を作成
     var mRotate = new THREE.Matrix4();
@@ -120,9 +81,6 @@ function init() {
 
     // 光源の位置に設定
     sphereMesh.position.set(vLightPosition.x,vLightPosition.y,vLightPosition.z);
-
-    //
-    vSpecularPower.set(controls.power,controls.power,controls.power);
 
     renderer.render(scene, camera);
     stats.update();
