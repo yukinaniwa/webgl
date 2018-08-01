@@ -50,10 +50,10 @@ function init() {
   // SHADER
   var vLightPosition = new THREE.Vector3();
 
-  //
+  // side: THREE.DoubleSide 両面 CULL=CCW?
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
-  var material = new THREE.MeshBasicMaterial( {color: 0x666666, side: THREE.DoubleSide} );
-  var plane = new THREE.Mesh( geometry, material );
+  var material = new THREE.MeshLambertMaterial( {color: 0x6699FF, side: THREE.DoubleSide} );
+  var plane = new THREE.Mesh( geometry, lambert );
   scene.add( plane );
   plane.position.y = -8000;
   plane.rotation.x = Math.PI/2;
