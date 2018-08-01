@@ -9,8 +9,8 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 10000, -4000);
-  initCameraControls(renderer, camera, 0, 32, 32);
+  const camera = initCamera(width, height, 0, 60000, -4000);
+  initCameraControls(renderer, camera, 0, 0, 0);
   const stats = attachFpsView()
 
   //
@@ -51,11 +51,11 @@ function init() {
   var vLightPosition = new THREE.Vector3();
 
   //
-  var geometry = new THREE.PlaneGeometry( 100000, 100000, 256 );
-  var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide, wireframe: true} );
+  var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
+  var material = new THREE.MeshBasicMaterial( {color: 0x666666, side: THREE.DoubleSide} );
   var plane = new THREE.Mesh( geometry, material );
   scene.add( plane );
-  plane.position.y = -500;
+  plane.position.y = -8000;
   plane.rotation.x = Math.PI/2;
 
   //
