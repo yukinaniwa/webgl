@@ -53,7 +53,7 @@ function init() {
   // side: THREE.DoubleSide 両面 CULL=CCW?
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
   var material = new THREE.MeshLambertMaterial( {color: 0x6699FF, side: THREE.DoubleSide} );
-  var plane = new THREE.Mesh( geometry, lambert );
+  var plane = new THREE.Mesh( geometry, material );
   scene.add( plane );
   plane.position.y = -8000;
   plane.rotation.x = Math.PI/2;
