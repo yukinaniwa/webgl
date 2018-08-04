@@ -16,6 +16,9 @@ function init() {
   //
   var progress_timer = 0;
 
+  //
+  var normalMap = dynamicNormalMap(renderer, progress_timer);
+
   var cubeTexture = new THREE.CubeTextureLoader()
   	.setPath('../textures/cubemap/')
   	.load( [
@@ -52,7 +55,8 @@ function init() {
 
   // side: THREE.DoubleSide 両面 CULL=CCW?
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
-  var material = new THREE.MeshLambertMaterial( {color: 0x6699FF, side: THREE.DoubleSide} );
+  // var material = new THREE.MeshLambertMaterial( {color: 0x6699FF, side: THREE.DoubleSide} );
+  var material = new THREE.MeshBasicMaterial({ map: normalMap.texture, side: THREE.DoubleSide });
   var plane = new THREE.Mesh( geometry, material );
   scene.add( plane );
   plane.position.y = -8000;
@@ -65,6 +69,10 @@ function init() {
     requestAnimationFrame(tick);
 
     progress_timer += (0.016*controls.lightspeed);
+
+    //
+    normalMap = dynamicNormalMap(renderer, progress_timer);
+    plane.material = new THREE.MeshBasicMaterial({ map: normalMap.texture, side: THREE.DoubleSide });
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
@@ -85,4 +93,33 @@ function init() {
     renderer.render(scene, camera);
     stats.update();
   }
+}
+
+function dynamicNormalMap(renderer, progress_timer) {
+  var bufferWidth = 512;
+  var bufferHeight = 512;
+
+  var bufferScene = new THREE.Scene();
+  var renderTarget = new THREE.WebGLRenderTarget(bufferWidth, bufferHeight, {
+      magFilter: THREE.NearestFilter,
+      minFilter: THREE.NearestFilter,
+      wrapS: THREE.ClampToEdgeWrapping,
+      wrapT: THREE.ClampToEdgeWrapping
+  });
+  var cameraTarget = new THREE.PerspectiveCamera( 45, bufferWidth/bufferHeight, 1, 1000 );
+
+  var geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
+  var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+  var torus = new THREE.Mesh( geometry, material );
+  bufferScene.add( torus );
+
+  torus.position.z = -100;
+  torus.rotation.x = (progress_timer*360) * ( Math.PI / 180 );
+  cameraTarget.position.set(0, 0, 0);
+
+  console.log('AAAAA: ', progress_timer);
+  // renderer.setClearColor(0x00FFFF, 1.0);
+  renderer.render(bufferScene, cameraTarget, renderTarget);
+
+  return renderTarget;
 }
