@@ -15,9 +15,11 @@ function init() {
 
   //
   var progress_timer = 0;
+  var progress_normalmap = 0;
 
-  //
-  var normalMap = dynamicNormalMap(renderer, progress_timer);
+  // RENDER TARGET
+  var renderTarget = new RenderTarget();
+  var normalMap = renderTarget.dynamicNormalMap(renderer, progress_normalmap);
 
   var cubeTexture = new THREE.CubeTextureLoader()
   	.setPath('../textures/cubemap/')
@@ -70,9 +72,13 @@ function init() {
 
     progress_timer += (0.016*controls.lightspeed);
 
+    progress_normalmap += 0.001;
+    if( progress_normalmap >= 1.0 ) {
+      progress_normalmap = 0.0;
+    }
+
     //
-    normalMap = dynamicNormalMap(renderer, progress_timer);
-    plane.material = new THREE.MeshBasicMaterial({ map: normalMap.texture, side: THREE.DoubleSide });
+    normalMap = renderTarget.dynamicNormalMap(renderer, progress_normalmap);
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
@@ -95,31 +101,35 @@ function init() {
   }
 }
 
-function dynamicNormalMap(renderer, progress_timer) {
-  var bufferWidth = 512;
-  var bufferHeight = 512;
+/**
+  Render Target
+*/
+class RenderTarget {
+  constructor() {
+    this.bufferWidth = 512;
+    this.bufferHeight = 512;
 
-  var bufferScene = new THREE.Scene();
-  var renderTarget = new THREE.WebGLRenderTarget(bufferWidth, bufferHeight, {
-      magFilter: THREE.NearestFilter,
-      minFilter: THREE.NearestFilter,
-      wrapS: THREE.ClampToEdgeWrapping,
-      wrapT: THREE.ClampToEdgeWrapping
-  });
-  var cameraTarget = new THREE.PerspectiveCamera( 45, bufferWidth/bufferHeight, 1, 1000 );
+    this.bufferScene = new THREE.Scene();
+    this.renderTarget = new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
+        magFilter: THREE.LinearFilter,
+        minFilter: THREE.LinearFilter
+    });
 
-  var geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
-  var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-  var torus = new THREE.Mesh( geometry, material );
-  bufferScene.add( torus );
+    this.cameraTarget = new THREE.PerspectiveCamera( 45, this.bufferWidth/this.bufferHeight, 1, 1000 );
+    this.cameraTarget.position.set(0, 0, 0);
 
-  torus.position.z = -100;
-  torus.rotation.x = (progress_timer*360) * ( Math.PI / 180 );
-  cameraTarget.position.set(0, 0, 0);
+    var geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
+    var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+    this.torus = new THREE.Mesh( geometry, material );
+    this.bufferScene.add( this.torus );
 
-  console.log('AAAAA: ', progress_timer);
-  // renderer.setClearColor(0x00FFFF, 1.0);
-  renderer.render(bufferScene, cameraTarget, renderTarget);
+    this.torus.position.z = -100;
+  }
 
-  return renderTarget;
+  dynamicNormalMap(renderer, progress_normalmap) {
+    this.torus.rotation.x = (progress_normalmap*360) * ( Math.PI / 180 );
+    renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget);
+
+    return this.renderTarget;
+  }
 }
