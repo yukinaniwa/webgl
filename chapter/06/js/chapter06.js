@@ -15,11 +15,10 @@ function init() {
 
   //
   var progress_timer = 0;
-  var progress_normalmap = 0;
 
   // RENDER TARGET
   var renderTarget = new RenderTarget();
-  var normalMap = renderTarget.dynamicNormalMap(renderer, progress_normalmap);
+  var normalMap = renderTarget.dynamicNormalMap(renderer);
 
   var cubeTexture = new THREE.CubeTextureLoader()
   	.setPath('../textures/cubemap/')
@@ -72,13 +71,8 @@ function init() {
 
     progress_timer += (0.016*controls.lightspeed);
 
-    progress_normalmap += 0.001;
-    if( progress_normalmap >= 1.0 ) {
-      progress_normalmap = 0.0;
-    }
-
     //
-    normalMap = renderTarget.dynamicNormalMap(renderer, progress_normalmap);
+    normalMap = renderTarget.dynamicNormalMap(renderer);
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
@@ -101,11 +95,14 @@ function init() {
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
 /**
   Render Target
 */
 class RenderTarget {
   constructor() {
+    this.progress_timer = 0
+
     this.bufferWidth = 512;
     this.bufferHeight = 512;
 
@@ -124,10 +121,27 @@ class RenderTarget {
     this.bufferScene.add( this.torus );
 
     this.torus.position.z = -100;
+
+    var cubeTexture = new THREE.CubeTextureLoader()
+      .setPath('../textures/cubemap/')
+      .load( [
+        'posx.jpg',
+        'negx.jpg',
+        'posy.jpg',
+        'negy.jpg',
+        'posz.jpg',
+        'negz.jpg'
+      ] );
+    this.bufferScene.background = cubeTexture;
   }
 
-  dynamicNormalMap(renderer, progress_normalmap) {
-    this.torus.rotation.x = (progress_normalmap*360) * ( Math.PI / 180 );
+  dynamicNormalMap(renderer) {
+    this.progress_timer += 0.005;
+    if( this.progress_timer >= 1.0 ) {
+      this.progress_timer = 0.0;
+    }
+
+    this.torus.rotation.x = (this.progress_timer*360) * ( Math.PI / 180 );
     renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget);
 
     return this.renderTarget;
