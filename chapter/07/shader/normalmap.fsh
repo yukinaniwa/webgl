@@ -1,6 +1,7 @@
 
 // varying: fragment shader に送るもの
 // viewMatrix と cameraPosition 送らなくても fsh で使える
+precision mediump float;
 
 varying mat4 vModelMatrix;       // オブジェクト座標からワールド座標へ変換する
 varying mat4 vModelViewMatrix;   // modelMatrixとviewMatrixの積算
@@ -15,6 +16,32 @@ uniform vec3 lightPos;
 uniform vec3 cameraPos;
 uniform vec3 specularPower;
 
+uniform float addWaveHeight;
+uniform vec2 addWavePos;
+uniform float springPower;
+uniform vec2 textureOffset;
+uniform sampler2D texture0;
+uniform float change;
+
 void main(){
-    gl_FragColor = vec4(vec3(0.22,0.33,1.0),1.0);
+
+    vec2 uv = vUv.xy;
+    vec4 wave = texture2D( texture0, uv );
+
+    float h1 = texture2D( texture0, uv + vec2( textureOffset.x,  0.0         ) ).r;
+    float h2 = texture2D( texture0, uv + vec2( 0.0,         textureOffset.y  ) ).r;
+    float h3 = texture2D( texture0, uv + vec2( -textureOffset.x, 0.0         ) ).r;
+    float h4 = texture2D( texture0, uv + vec2( 0.0,         -textureOffset.y ) ).r;
+
+    float v = ( ( h1 + h2 + h3 + h4 ) * 0.25 - wave.r ) * springPower + wave.g;
+    float h = wave.r + v;
+
+    float dist = distance( uv, addWavePos );
+    if( dist < 0.0086 ){
+       v += addWaveHeight;
+    }
+
+    //h = h - h * 0.001;
+
+    gl_FragColor = vec4( h, v, springPower, 1.0 );
 }

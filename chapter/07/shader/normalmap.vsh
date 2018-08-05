@@ -12,10 +12,12 @@ varying vec3 vNormal;            // 頂点法線ベクトル
 varying vec2 vUv;                // テクスチャを貼るためのUV座標
 
 void main() {
-vNormal = normal;
-vPosition = position;
-vProjectionMatrix = projectionMatrix;
-vModelViewMatrix = modelViewMatrix;
+  vUv = uv;
+  vNormal = normal;
+  vPosition = position;
+  vProjectionMatrix = projectionMatrix;
+  vModelViewMatrix = modelViewMatrix;
 
+  //gl_Position = vec4( vPosition, 1.0 );
   gl_Position = vProjectionMatrix * vModelViewMatrix * vec4( vPosition, 1.0 );
 }

@@ -17,8 +17,12 @@ function init() {
   var progress_timer = 0;
 
   // RENDER TARGET
-  var renderTarget = new RenderTarget();
-  var normalMap = renderTarget.dynamicNormalMap(renderer);
+  var normalMap = new NormalMap(renderer);
+  var prevNormalMap = new THREE.Texture();
+  addWave();
+  addWave();
+  addWave();
+  // prevNormalMap = normalMap.dynamicNormalMap(prevNormalMap);
 
   var cubeTexture = new THREE.CubeTextureLoader()
   	.setPath('../textures/cubemap/')
@@ -35,9 +39,14 @@ function init() {
   // GUI
   var controls = new function () {
       this.lightspeed = 1;
+      this.springPower = 0.33;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
+  gui.add(controls, 'springPower', 0.0, 6.0);
+  document.getElementById("GLCanvas").onclick = function() {
+    addWave();
+  };
 
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
@@ -56,8 +65,7 @@ function init() {
 
   // side: THREE.DoubleSide 両面 CULL=CCW?
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
-  // var material = new THREE.MeshLambertMaterial( {color: 0x6699FF, side: THREE.DoubleSide} );
-  var material = new THREE.MeshBasicMaterial({ map: normalMap.texture, side: THREE.DoubleSide });
+  var material = new THREE.MeshBasicMaterial({ map: normalMap.renderTarget.texture, side: THREE.DoubleSide });
   var plane = new THREE.Mesh( geometry, material );
   scene.add( plane );
   plane.position.y = -8000;
@@ -70,9 +78,11 @@ function init() {
     requestAnimationFrame(tick);
 
     progress_timer += (0.016*controls.lightspeed);
+    normalMap.setSpringPower(controls.springPower);
 
     //
-    normalMap = renderTarget.dynamicNormalMap(renderer);
+    // console.log('set map.')
+    prevNormalMap = normalMap.dynamicNormalMap(prevNormalMap);
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
@@ -93,15 +103,23 @@ function init() {
     renderer.render(scene, camera);
     stats.update();
   }
+
+  function addWave() {
+    var x = (Math.random()%100) * 1.0;
+    var y = (Math.random()%100) * 1.0;
+    var height = (Math.random()%100-50) * 0.3;
+    normalMap.addWavePoint( x, y, height );
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /**
   Render Target
 */
-class RenderTarget {
-  constructor() {
-    this.progress_timer = 0
+class NormalMap {
+  constructor(renderer) {
+    this.renderer = renderer;
+    this.progress_timer = 0;
 
     this.bufferWidth = 512;
     this.bufferHeight = 512;
@@ -116,40 +134,56 @@ class RenderTarget {
     this.cameraTarget = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
     this.cameraTarget.position.z = this.bufferHeight / 2;
 
+    this.waveHeight = 0.3;
+    this.springPower = 0.5;
+    this.wavePoint = new THREE.Vector2( 0.5 , 0.5 );
+    this.normalMap = new THREE.Texture();
+
+    this.renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget, true);
+
     this.material = new THREE.ShaderMaterial({
       vertexShader: loadShaderFile("shader/normalmap.vsh"),
       fragmentShader: loadShaderFile("shader/normalmap.fsh"),
       side: THREE.DoubleSide,
+      depthWrite: false,
       uniforms:{
+        texture0: { type: "t", value: this.normalMap },
+        textureOffset: { type: "v2", value: new THREE.Vector2( 1.0/this.bufferWidth, 1.0/this.bufferHeight ) },
+        springPower: { type: "f", value: this.springPower },
+        addWavePos: { type: "v2", value: this.wavePoint },
+        addWaveHeight: { type: "f", value: this.waveHeight },
       },
     });
 
-    let geometry = new THREE.Geometry();
-    geometry.vertices = [
-        new THREE.Vector3(-1.0 * this.aspect, 1.0, 0.0),
-        new THREE.Vector3(1.0 * this.aspect, 1.0, 0.0),
-        new THREE.Vector3(-1.0 * this.aspect, -1.0, 0.0),
-        new THREE.Vector3(1.0 * this.aspect, -1.0, 0.0)
-    ];
-    geometry.faces = [
-        new THREE.Face3(0, 2, 1),
-        new THREE.Face3(1, 2, 3)
-    ];
-
+    var geometry = new THREE.PlaneGeometry( 1, 1, 1, 1 );
     this.plane = new THREE.Mesh( geometry, this.material );
     this.bufferScene.add( this.plane );
 
-    this.plane.scale.x = this.bufferWidth / 2;
-    this.plane.scale.y = this.bufferHeight / 2;
+    this.plane.scale.x = this.bufferWidth;
+    this.plane.scale.y = this.bufferHeight;
   }
 
-  dynamicNormalMap(renderer) {
+  addWavePoint(x, y, height) {
+    this.wavePoint.x = x;
+    this.wavePoint.y = y;
+    this.waveHeight = height;
+
+    console.log('addWavePoint..');
+  }
+
+  setSpringPower(power) {
+    this.springPower = power;
+  }
+
+  dynamicNormalMap(prevNormalMap) {
     this.progress_timer += 0.005;
     if( this.progress_timer >= 1.0 ) {
       this.progress_timer = 0.0;
     }
-    renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget);
 
+    this.normalMap = prevNormalMap;
+
+    this.renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget, true);
     return this.renderTarget;
   }
 }
