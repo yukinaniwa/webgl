@@ -105,6 +105,7 @@ class RenderTarget {
 
     this.bufferWidth = 512;
     this.bufferHeight = 512;
+    this.aspect = this.bufferWidth / this.bufferHeight;
 
     this.bufferScene = new THREE.Scene();
     this.renderTarget = new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
@@ -112,27 +113,34 @@ class RenderTarget {
         minFilter: THREE.LinearFilter
     });
 
-    this.cameraTarget = new THREE.PerspectiveCamera( 45, this.bufferWidth/this.bufferHeight, 1, 1000 );
-    this.cameraTarget.position.set(0, 0, 0);
+    this.cameraTarget = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
+    this.cameraTarget.position.z = this.bufferHeight / 2;
 
-    var geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
-    var material = new THREE.MeshBasicMaterial( { color: 0x33ffff } );
-    this.torus = new THREE.Mesh( geometry, material );
-    this.bufferScene.add( this.torus );
+    this.material = new THREE.ShaderMaterial({
+      vertexShader: loadShaderFile("shader/normalmap.vsh"),
+      fragmentShader: loadShaderFile("shader/normalmap.fsh"),
+      side: THREE.DoubleSide,
+      uniforms:{
+      },
+    });
 
-    this.torus.position.z = -100;
+    let geometry = new THREE.Geometry();
+    geometry.vertices = [
+        new THREE.Vector3(-1.0 * this.aspect, 1.0, 0.0),
+        new THREE.Vector3(1.0 * this.aspect, 1.0, 0.0),
+        new THREE.Vector3(-1.0 * this.aspect, -1.0, 0.0),
+        new THREE.Vector3(1.0 * this.aspect, -1.0, 0.0)
+    ];
+    geometry.faces = [
+        new THREE.Face3(0, 2, 1),
+        new THREE.Face3(1, 2, 3)
+    ];
 
-    var cubeTexture = new THREE.CubeTextureLoader()
-      .setPath('../textures/cubemap/')
-      .load( [
-        'posx.jpg',
-        'negx.jpg',
-        'posy.jpg',
-        'negy.jpg',
-        'posz.jpg',
-        'negz.jpg'
-      ] );
-    this.bufferScene.background = cubeTexture;
+    this.plane = new THREE.Mesh( geometry, this.material );
+    this.bufferScene.add( this.plane );
+
+    this.plane.scale.x = this.bufferWidth / 2;
+    this.plane.scale.y = this.bufferHeight / 2;
   }
 
   dynamicNormalMap(renderer) {
@@ -140,8 +148,6 @@ class RenderTarget {
     if( this.progress_timer >= 1.0 ) {
       this.progress_timer = 0.0;
     }
-
-    this.torus.rotation.x = (this.progress_timer*360) * ( Math.PI / 180 );
     renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget);
 
     return this.renderTarget;
