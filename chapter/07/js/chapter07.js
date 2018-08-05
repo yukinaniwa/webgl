@@ -125,14 +125,16 @@ class NormalMap {
     this.bufferScene = new THREE.Scene();
 
     this.index = 0;
-    this.renderTarget1 = new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
+    this.renderTarget = [
+      new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
         magFilter: THREE.LinearFilter,
         minFilter: THREE.LinearFilter
-    });
-    this.renderTarget2 = new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
+      }),
+      new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
         magFilter: THREE.LinearFilter,
         minFilter: THREE.LinearFilter
-    });
+      })
+    ];
 
     this.cameraTarget = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
     this.cameraTarget.position.z = this.bufferHeight / 2;
@@ -140,39 +142,39 @@ class NormalMap {
     this.waveHeight = 0.3;
     this.springPower = 0.5;
     this.wavePoint = new THREE.Vector2( 0.5 , 0.5 );
+    this.textureOffset = new THREE.Vector2( 1.0/this.bufferWidth, 1.0/this.bufferHeight );
 
-    this.renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget, true);
-
-    this.material1 = new THREE.ShaderMaterial({
-      vertexShader: loadShaderFile("shader/normalmap.vsh"),
-      fragmentShader: loadShaderFile("shader/normalmap.fsh"),
-      side: THREE.DoubleSide,
-      depthWrite: false,
-      uniforms:{
-        texture0: { type: "t", value: this.renderTarget1.texture },
-        textureOffset: { type: "v2", value: new THREE.Vector2( 1.0/this.bufferWidth, 1.0/this.bufferHeight ) },
-        springPower: { type: "f", value: this.springPower },
-        addWavePos: { type: "v2", value: this.wavePoint },
-        addWaveHeight: { type: "f", value: this.waveHeight },
-      },
-    });
-
-    this.material2 = new THREE.ShaderMaterial({
-      vertexShader: loadShaderFile("shader/normalmap.vsh"),
-      fragmentShader: loadShaderFile("shader/normalmap.fsh"),
-      side: THREE.DoubleSide,
-      depthWrite: false,
-      uniforms:{
-        texture0: { type: "t", value: this.renderTarget2.texture },
-        textureOffset: { type: "v2", value: new THREE.Vector2( 1.0/this.bufferWidth, 1.0/this.bufferHeight ) },
-        springPower: { type: "f", value: this.springPower },
-        addWavePos: { type: "v2", value: this.wavePoint },
-        addWaveHeight: { type: "f", value: this.waveHeight },
-      },
-    });
+    this.material = [
+        new THREE.ShaderMaterial({
+          vertexShader: loadShaderFile("shader/normalmap.vsh"),
+          fragmentShader: loadShaderFile("shader/normalmap.fsh"),
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          uniforms:{
+            texture0: { type: "t", value: this.renderTarget[0].texture },
+            textureOffset: { type: "v2", value: this.textureOffset },
+            springPower: { type: "f", value: this.springPower },
+            addWavePos: { type: "v2", value: this.wavePoint },
+            addWaveHeight: { type: "f", value: this.waveHeight },
+          },
+        })
+      ,new THREE.ShaderMaterial({
+        vertexShader: loadShaderFile("shader/normalmap.vsh"),
+        fragmentShader: loadShaderFile("shader/normalmap.fsh"),
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        uniforms:{
+          texture0: { type: "t", value: this.renderTarget[1].texture },
+          textureOffset: { type: "v2", value: this.textureOffset },
+          springPower: { type: "f", value: this.springPower },
+          addWavePos: { type: "v2", value: this.wavePoint },
+          addWaveHeight: { type: "f", value: this.waveHeight },
+        },
+      })
+    ];
 
     var geometry = new THREE.PlaneGeometry( 1, 1, 1, 1 );
-    this.plane = new THREE.Mesh( geometry, this.material2 );
+    this.plane = new THREE.Mesh( geometry, this.material[1] );
     this.bufferScene.add( this.plane );
 
     this.plane.scale.x = this.bufferWidth;
@@ -194,21 +196,14 @@ class NormalMap {
   }
 
   currentRenderTarget() {
-    if( this.index == 0 ) {
-      return this.renderTarget1.texture;
-    }
-    return this.renderTarget2.texture;
+    return this.renderTarget[this.index].texture;
   }
 
   changeBuffer() {
     this.index ^= 1;
-    if( this.index == 0 ) {
-      this.plane.material = this.material1;
-      this.renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget2);
-    } else {
-      this.plane.material = this.material2;
-      this.renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget1);
-    }
+
+    this.plane.material = this.material[this.index];
+    this.renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget[this.index^1]);
   }
 
   dynamicNormalMap() {
