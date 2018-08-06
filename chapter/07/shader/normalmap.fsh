@@ -41,8 +41,8 @@ void main(){
        v += addWaveHeight;
     }
 
-    h = h - h*0.01;
-    v = v - v*0.01;
+    h = h - h*0.0268;
+    v = v - v*0.0268;
 
     gl_FragColor = vec4( h, v, 0.0, 1.0 );
 }

@@ -16,9 +16,6 @@ function init() {
   //
   var progress_timer = 0;
 
-  // RENDER TARGET
-  var normalMap = new NormalMap(renderer);
-
   var cubeTexture = new THREE.CubeTextureLoader()
   	.setPath('../textures/cubemap/')
   	.load( [
@@ -31,6 +28,9 @@ function init() {
   	] );
   scene.background = cubeTexture;
 
+  // RENDER TARGET
+  var normalMap = new NormalMap(renderer);
+
   // GUI
   var controls = new function () {
       this.lightspeed = 1;
@@ -40,7 +40,7 @@ function init() {
   gui.add(controls, 'lightspeed', 0.0, 6.0);
   gui.add(controls, 'springPower', 0.0, 6.0);
   document.getElementById("GLCanvas").onclick = function() {
-    addWave();
+    normalMap.addWave();
   };
 
   // light
@@ -73,7 +73,6 @@ function init() {
     requestAnimationFrame(tick);
 
     progress_timer += (0.016*controls.lightspeed);
-    normalMap.setSpringPower(controls.springPower);
 
     //
     normalMap.dynamicNormalMap();
@@ -97,15 +96,6 @@ function init() {
 
     renderer.render(scene, camera);
     stats.update();
-  }
-
-  function addWave() {
-    var x = (Math.random()%100) * 1.0;
-    var y = (Math.random()%100) * 1.0;
-    var height = (Math.random()%100-50) * 0.2;
-    var power = (Math.random()%100) * 0.68;
-
-    normalMap.addWavePoint( x, y, height, power );
   }
 }
 
@@ -139,9 +129,9 @@ class NormalMap {
     this.cameraTarget = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
     this.cameraTarget.position.z = this.bufferHeight / 2;
 
-    this.waveHeight = 0.3;
-    this.springPower = 0.5;
-    this.wavePoint = new THREE.Vector2( 0.5 , 0.5 );
+    this.waveHeight = 0.73;
+    this.springPower = 0.95;
+    this.wavePoint = new THREE.Vector2( -1.0 , -1.0 );
     this.textureOffset = new THREE.Vector2( 1.0/this.bufferWidth, 1.0/this.bufferHeight );
 
     this.material = [
@@ -181,25 +171,25 @@ class NormalMap {
     this.plane.scale.y = this.bufferHeight;
   }
 
-  addWavePoint(x, y, height, power) {
+  addWave() {
+    var x = (Math.random()%100) * 1.0;
+    var y = (Math.random()%100) * 1.0;
+    var height = ((Math.random()%100)*2.0-1.0) * 0.64;
+    var power = (Math.random()%100) * 0.386;
+
     this.wavePoint.x = x;
     this.wavePoint.y = y;
     this.waveHeight = height;
     this.springPower = power;
 
-    this.changeBuffer();
-    console.log('addWavePoint..');
-  }
-
-  setSpringPower(power) {
-    this.springPower = power;
+    console.log('wave: ', this.wavePoint.x, this.wavePoint.y, this.waveHeight, this.springPower);
   }
 
   currentRenderTarget() {
     return this.renderTarget[this.index].texture;
   }
 
-  changeBuffer() {
+  renderBuffer() {
     this.index ^= 1;
 
     this.plane.material = this.material[this.index];
@@ -212,7 +202,12 @@ class NormalMap {
       this.progress_timer = 0.0;
     }
 
-    this.changeBuffer();
-    return this.renderTarget;
+    this.renderBuffer();
+
+    // setting reset
+    this.wavePoint.x = -1;
+    this.wavePoint.y = -1;
+    this.waveHeight = 0;
+    this.springPower = 0;
   }
 }
