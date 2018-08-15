@@ -37,11 +37,13 @@ function init() {
   // GUI
   var controls = new function () {
       this.lightspeed = 1;
-      this.springPower = 0.33;
+      this.alpha = 0.86;
+      this.bumpPower = 512.0;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
-  gui.add(controls, 'springPower', 0.0, 6.0);
+  gui.add(controls, 'alpha', 0.28, 1.0);
+  gui.add(controls, 'bumpPower', 0.1, 2048.0);
   document.getElementById("GLCanvas").onclick = function() {
     normalMap.addWave();
   };
@@ -65,7 +67,7 @@ function init() {
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
 
   var texture = new THREE.TextureLoader().load( '../textures/cubemap/negy.jpg' );
-  var material = new THREE.MeshPhongMaterial({ color: 0x40a4df, map: texture, bumpMap:normalMap.normalTexture(), bumpScale: 768.68, side: THREE.DoubleSide, transparent: true, opacity: 0.48 });
+  var material = new THREE.MeshPhongMaterial({ color: 0x40a4df, map: texture, bumpMap: normalMap.normalTexture(), bumpScale: controls.bumpPower, side: THREE.DoubleSide, transparent: true, opacity: controls.alpha });
   // var material = new THREE.MeshBasicMaterial({ map: normalMap.normalTexture(), side: THREE.DoubleSide });
   var plane = new THREE.Mesh( geometry, material );
   scene.add( plane );
@@ -84,7 +86,6 @@ function init() {
     if( addwave_counter > addwave_span ) {
       addwave_counter = 0;
       addwave_span = (Math.random()*90)+10;
-      console.log('addwave_span: ', addwave_span);
 
       normalMap.addWave();
     }
@@ -92,6 +93,8 @@ function init() {
     //
     normalMap.dynamicNormalMap();
     material.bumpMap = normalMap.normalTexture();
+    material.opacity = controls.alpha;
+    material.bumpScale = controls.bumpPower;
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
