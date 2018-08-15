@@ -215,8 +215,8 @@ class Uniforms {
 
     var x = (Math.random()%100) * 1.0;
     var y = (Math.random()%100) * 1.0;
-    var height = ((Math.random()%100)*2.0-1.0) * 0.86;
-    var power = (Math.random()%100) * 0.68;
+    var height = ((Math.random()%100)*2.0-1.0) * 1.086;
+    var power = (Math.random()%100) * 1.13;
 
     this.wavePoint.x = x;
     this.wavePoint.y = y;
@@ -244,7 +244,7 @@ class NormalMap {
     this.renderer = renderer;
     this.progress_timer = 0;
 
-    this.renderTarget = new RenderTarget(512, 512);
+    this.renderTarget = new RenderTarget(1024, 1024);
     this.shader = new Shader(this.renderTarget);
 
     this.bufferScene = new THREE.Scene();
