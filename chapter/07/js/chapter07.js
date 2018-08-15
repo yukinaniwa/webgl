@@ -16,6 +16,9 @@ function init() {
   //
   var progress_timer = 0;
 
+  var addwave_span = 50;
+  var addwave_counter = 0;
+
   var cubeTexture = new THREE.CubeTextureLoader()
   	.setPath('../textures/cubemap/')
   	.load( [
@@ -60,7 +63,10 @@ function init() {
 
   // side: THREE.DoubleSide 両面 CULL=CCW?
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
-  var material = new THREE.MeshBasicMaterial({ map: normalMap.normalTexture(), side: THREE.DoubleSide });
+
+  var texture = new THREE.TextureLoader().load( '../textures/cubemap/negy.jpg' );
+  var material = new THREE.MeshPhongMaterial({ color: 0x40a4df, map: texture, bumpMap:normalMap.normalTexture(), bumpScale: 768.68, side: THREE.DoubleSide, transparent: true, opacity: 0.48 });
+  // var material = new THREE.MeshBasicMaterial({ map: normalMap.normalTexture(), side: THREE.DoubleSide });
   var plane = new THREE.Mesh( geometry, material );
   scene.add( plane );
   plane.position.y = -8000;
@@ -74,9 +80,17 @@ function init() {
 
     progress_timer += (0.016*controls.lightspeed);
 
+    addwave_counter++;
+    if( addwave_counter > addwave_span ) {
+      addwave_counter = 0;
+      addwave_span = (Math.random()%80)+20;
+
+      normalMap.addWave();
+    }
+
     //
     normalMap.dynamicNormalMap();
-    material.map = normalMap.normalTexture();
+    material.bumpMap = normalMap.normalTexture();
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
