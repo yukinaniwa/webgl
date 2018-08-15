@@ -39,13 +39,13 @@ function init() {
       this.lightspeed = 1;
       this.alpha = 0.86;
       this.bumpPower = 512.0;
-      this.waveSpan = 90;
+      this.waveSpan = 10;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
   gui.add(controls, 'alpha', 0.28, 1.0);
   gui.add(controls, 'bumpPower', 0.1, 2048.0);
-  gui.add(controls, 'waveSpan', 1, 160);
+  gui.add(controls, 'waveSpan', 1, 100);
   document.getElementById("GLCanvas").onclick = function() {
     normalMap.addWave();
   };
