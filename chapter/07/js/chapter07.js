@@ -60,7 +60,7 @@ function init() {
 
   // side: THREE.DoubleSide 両面 CULL=CCW?
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
-  var material = new THREE.MeshBasicMaterial({ map: normalMap.currentRenderTarget(), side: THREE.DoubleSide });
+  var material = new THREE.MeshBasicMaterial({ map: normalMap.normalTexture(), side: THREE.DoubleSide });
   var plane = new THREE.Mesh( geometry, material );
   scene.add( plane );
   plane.position.y = -8000;
@@ -76,7 +76,7 @@ function init() {
 
     //
     normalMap.dynamicNormalMap();
-    material.map = normalMap.currentRenderTarget();
+    material.map = normalMap.normalTexture();
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
@@ -103,79 +103,100 @@ function init() {
 /**
   Render Target
 */
-class NormalMap {
-  constructor(renderer) {
-    this.renderer = renderer;
-    this.progress_timer = 0;
-
-    this.bufferWidth = 512;
-    this.bufferHeight = 512;
+class RenderTarget {
+  constructor(bufferWidth, bufferHeight) {
+    this.index = 0;
+    this.bufferWidth = bufferWidth;
+    this.bufferHeight = bufferHeight;
     this.aspect = this.bufferWidth / this.bufferHeight;
 
-    this.bufferScene = new THREE.Scene();
-
-    this.index = 0;
-    this.renderTarget = [
-      new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
+    this.heightBuffer = [
+      new THREE.WebGLRenderTarget(bufferWidth, bufferHeight, {
         magFilter: THREE.LinearFilter,
         minFilter: THREE.LinearFilter
       }),
-      new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
+      new THREE.WebGLRenderTarget(bufferWidth, bufferHeight, {
         magFilter: THREE.LinearFilter,
         minFilter: THREE.LinearFilter
       })
     ];
+  }
 
-    this.cameraTarget = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
-    this.cameraTarget.position.z = this.bufferHeight / 2;
+  normalTexture() {
+    return this.heightBuffer[this.index].texture
+  }
+}
 
-    this.waveHeight = 0.73;
-    this.springPower = 0.95;
-    this.wavePoint = new THREE.Vector2( -1.0 , -1.0 );
-    this.textureOffset = new THREE.Vector2( 1.0/this.bufferWidth, 1.0/this.bufferHeight );
+///////////////////////////////////////////////////////////////////////////////
+/**
+  GLSL
+*/
+class Shader {
+  constructor(renderTarget) {
+    this.uniforms = new Uniforms(renderTarget.bufferWidth, renderTarget.bufferHeight)
 
-    this.material = [
+    // height map shader
+    this.heightMap = [
         new THREE.ShaderMaterial({
-          vertexShader: loadShaderFile("shader/normalmap.vsh"),
-          fragmentShader: loadShaderFile("shader/normalmap.fsh"),
+          vertexShader: loadShaderFile("shader/vertex.vsh"),
+          fragmentShader: loadShaderFile("shader/heightmap.fsh"),
           side: THREE.DoubleSide,
           depthWrite: false,
           uniforms:{
-            texture0: { type: "t", value: this.renderTarget[0].texture },
-            textureOffset: { type: "v2", value: this.textureOffset },
-            springPower: { type: "f", value: this.springPower },
-            addWavePos: { type: "v2", value: this.wavePoint },
-            addWaveHeight: { type: "f", value: this.waveHeight },
+            texture0: { type: "t", value: renderTarget.heightBuffer[0].texture },
+            textureOffset: { type: "v2", value: this.uniforms.textureOffset },
+            springPower: { type: "f", value: this.uniforms.springPower },
+            addWavePos: { type: "v2", value: this.uniforms.wavePoint },
+            addWaveHeight: { type: "f", value: this.uniforms.waveHeight },
           },
         })
       ,new THREE.ShaderMaterial({
-        vertexShader: loadShaderFile("shader/normalmap.vsh"),
-        fragmentShader: loadShaderFile("shader/normalmap.fsh"),
+        vertexShader: loadShaderFile("shader/vertex.vsh"),
+        fragmentShader: loadShaderFile("shader/heightmap.fsh"),
         side: THREE.DoubleSide,
         depthWrite: false,
         uniforms:{
-          texture0: { type: "t", value: this.renderTarget[1].texture },
-          textureOffset: { type: "v2", value: this.textureOffset },
-          springPower: { type: "f", value: this.springPower },
-          addWavePos: { type: "v2", value: this.wavePoint },
-          addWaveHeight: { type: "f", value: this.waveHeight },
+          texture0: { type: "t", value: renderTarget.heightBuffer[1].texture },
+          textureOffset: { type: "v2", value: this.uniforms.textureOffset },
+          springPower: { type: "f", value: this.uniforms.springPower },
+          addWavePos: { type: "v2", value: this.uniforms.wavePoint },
+          addWaveHeight: { type: "f", value: this.uniforms.waveHeight },
         },
       })
     ];
 
-    var geometry = new THREE.PlaneGeometry( 1, 1, 1, 1 );
-    this.plane = new THREE.Mesh( geometry, this.material[1] );
-    this.bufferScene.add( this.plane );
+    // normal map shader
+    this.normalMap = new THREE.ShaderMaterial({
+      vertexShader: loadShaderFile("shader/vertex.vsh"),
+      fragmentShader: loadShaderFile("shader/normalmap.fsh"),
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      uniforms:{
+        texture0: { type: "t", value: renderTarget.heightBuffer[1].texture },
+        textureOffset: { type: "v2", value: this.uniforms.textureOffset },
+      },
+    });
+  }
+}
 
-    this.plane.scale.x = this.bufferWidth;
-    this.plane.scale.y = this.bufferHeight;
+///////////////////////////////////////////////////////////////////////////////
+/**
+  Uniforms
+*/
+class Uniforms {
+  constructor(bufferWidth, bufferHeight) {
+    this.waveHeight = 0.73;
+    this.springPower = 0.95;
+    this.wavePoint = new THREE.Vector2( -1.0 , -1.0 );
+    this.textureOffset = new THREE.Vector2( 1.0/bufferWidth, 1.0/bufferHeight );
   }
 
-  addWave() {
+  set() {
+
     var x = (Math.random()%100) * 1.0;
     var y = (Math.random()%100) * 1.0;
-    var height = ((Math.random()%100)*2.0-1.0) * 0.64;
-    var power = (Math.random()%100) * 0.386;
+    var height = ((Math.random()%100)*2.0-1.0) * 0.86;
+    var power = (Math.random()%100) * 0.68;
 
     this.wavePoint.x = x;
     this.wavePoint.y = y;
@@ -185,15 +206,61 @@ class NormalMap {
     console.log('wave: ', this.wavePoint.x, this.wavePoint.y, this.waveHeight, this.springPower);
   }
 
-  currentRenderTarget() {
-    return this.renderTarget[this.index].texture;
+  reset() {
+    this.wavePoint.x = -1;
+    this.wavePoint.y = -1;
+    this.waveHeight = 0;
+    this.springPower = 0;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/**
+  NormalMap
+*/
+class NormalMap {
+  constructor(renderer) {
+
+    this.renderer = renderer;
+    this.progress_timer = 0;
+
+    this.renderTarget = new RenderTarget(512, 512);
+    this.shader = new Shader(this.renderTarget);
+
+    this.bufferScene = new THREE.Scene();
+    this.cameraTarget = new THREE.PerspectiveCamera(90, this.renderTarget.aspect, 0.1, 1000);
+    this.cameraTarget.position.z = this.renderTarget.bufferHeight / 2;
+
+
+    var geometry = new THREE.PlaneGeometry( 1, 1, 1, 1 );
+    this.plane = new THREE.Mesh(geometry, this.shader.heightMap[1]);
+    this.bufferScene.add(this.plane);
+
+    this.plane.scale.x = this.renderTarget.bufferWidth;
+    this.plane.scale.y = this.renderTarget.bufferHeight;
+  }
+
+  addWave() {
+    this.shader.uniforms.set();
+  }
+
+  normalTexture() {
+    return this.renderTarget.normalTexture();
   }
 
   renderBuffer() {
-    this.index ^= 1;
+    // Height Map
+    this.renderTarget.index ^= 1;
+    this.plane.material = this.shader.heightMap[ this.renderTarget.index ];
 
-    this.plane.material = this.material[this.index];
-    this.renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget[this.index^1]);
+    var currentBuffer = this.renderTarget.heightBuffer[ this.renderTarget.index ];
+    var nextBuffer = this.renderTarget.heightBuffer[ this.renderTarget.index^1 ];
+    this.renderer.render(this.bufferScene, this.cameraTarget, nextBuffer);
+
+    // Normal Map
+    this.shader.normalMap.uniforms['texture0'] = { type: "t", value: nextBuffer.texture };
+    this.plane.material = this.shader.normalMap;
+    this.renderer.render(this.bufferScene, this.cameraTarget, currentBuffer);
   }
 
   dynamicNormalMap() {
@@ -205,9 +272,6 @@ class NormalMap {
     this.renderBuffer();
 
     // setting reset
-    this.wavePoint.x = -1;
-    this.wavePoint.y = -1;
-    this.waveHeight = 0;
-    this.springPower = 0;
+    this.shader.uniforms.reset();
   }
 }
