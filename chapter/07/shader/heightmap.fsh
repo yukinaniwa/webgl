@@ -37,12 +37,14 @@ void main(){
     float h = wave.r + v;
 
     float dist = distance(uv, addWavePos);
-    if( dist < 0.0026 ){
+    if( dist < 0.00086 ){
        v += addWaveHeight;
     }
 
-    h = h - h*0.0162;
-    v = v - v*0.0162;
+    h = h - h*0.0126;
+    v = v - v*0.0126;
+    if( h <= 0.0026 ) { h = 0.0; }
+    if( v <= 0.0026 ) { v = 0.0; }
 
     gl_FragColor = vec4(h, v, 0.0, 1.0);
 }
