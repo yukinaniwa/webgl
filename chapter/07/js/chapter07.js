@@ -83,7 +83,8 @@ function init() {
     addwave_counter++;
     if( addwave_counter > addwave_span ) {
       addwave_counter = 0;
-      addwave_span = (Math.random()%80)+20;
+      addwave_span = (Math.random()*90)+10;
+      console.log('addwave_span: ', addwave_span);
 
       normalMap.addWave();
     }
