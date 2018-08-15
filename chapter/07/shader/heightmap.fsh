@@ -1,6 +1,7 @@
 
 // varying: fragment shader に送るもの
 // viewMatrix と cameraPosition 送らなくても fsh で使える
+precision mediump float;
 
 varying mat4 vModelMatrix;       // オブジェクト座標からワールド座標へ変換する
 varying mat4 vModelViewMatrix;   // modelMatrixとviewMatrixの積算
@@ -15,17 +16,33 @@ uniform vec3 lightPos;
 uniform vec3 cameraPos;
 uniform vec3 specularPower;
 
-void main() {
-  vec3 eyeVector = normalize(cameraPos - vPosition);
-  vec3 lightVector = normalize(vPosition - lightPos);
+uniform float addWaveHeight;
+uniform vec2 addWavePos;
+uniform float springPower;
+uniform vec2 textureOffset;
+uniform sampler2D texture0;
+uniform float change;
 
-  float NdotL = max(0.0, dot(vNormal, lightVector));
-  // R = L + 2 * N * (N ・L)
-  // H=(ViewDir + L)/|ViewDir+L|
-  vec3 R = normalize(-lightVector + 2.0 * vNormal * NdotL);
-  float spec = pow(max(0.0, dot(R, eyeVector)), specularPower.x);
+void main(){
 
-  vec3 phong = NdotL + spec + vec3(0.1, 0.1, 0.1);
+    vec2 uv = vUv.xy;
+    vec4 wave = texture2D(texture0, uv);
 
-  gl_FragColor = vec4(phong, 1.0);
+    float h1 = texture2D(texture0, uv + vec2(textureOffset.x, 0.0)).r;
+    float h2 = texture2D(texture0, uv + vec2(0.0, textureOffset.y)).r;
+    float h3 = texture2D(texture0, uv + vec2(-textureOffset.x, 0.0)).r;
+    float h4 = texture2D(texture0, uv + vec2(0.0, -textureOffset.y)).r;
+
+    float v = ((h1 + h2 + h3 + h4) * 0.25 - wave.r) * springPower + wave.g;
+    float h = wave.r + v;
+
+    float dist = distance(uv, addWavePos);
+    if( dist < 0.0026 ){
+       v += addWaveHeight;
+    }
+
+    h = h - h*0.0162;
+    v = v - v*0.0162;
+
+    gl_FragColor = vec4(h, v, 0.0, 1.0);
 }
