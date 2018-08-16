@@ -42,6 +42,8 @@ function init() {
       this.bumpScale = 1.0;
       this.bumpBias = 1.0;
       this.lightIntensity = 1.0;
+      this.heightScale = 0.0;
+      this.wireframe = false;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
@@ -50,6 +52,12 @@ function init() {
   gui.add(controls, 'bumpScale', 1.5, 64.0);
   gui.add(controls, 'bumpBias', 1.0, 32.0);
   gui.add(controls, 'lightIntensity', 0.1, 4.0);
+  gui.add(controls, 'heightScale', 0.0, 64.0);
+  gui.add(controls, 'wireframe').onChange(changeWireFrame);
+  function changeWireFrame() {
+    parallax.wireframe = controls.wireframe;
+  };
+
   document.getElementById("GLCanvas").onclick = function() {
     normalMap.addWave();
   };
@@ -70,7 +78,7 @@ function init() {
   var vLightPosition = new THREE.Vector3();
 
   // side: THREE.DoubleSide 両面 CULL=CCW?
-  var geometry = new THREE.PlaneGeometry( 100000, 100000, 1024 );
+  var geometry = new THREE.PlaneGeometry( 100000, 100000, 256 );
   var texture = new THREE.TextureLoader().load( '../textures/cubemap/negy.jpg' );
 
   var parallax = new THREE.ShaderMaterial({
@@ -79,6 +87,7 @@ function init() {
     side: THREE.DoubleSide,
     transparent: true,
     opacity: controls.opacity,
+    wireframe: controls.wireframe,
     uniforms:{
       texture0: { type: "t", value: texture },
       texture1: { type: "t", value: normalMap.normalTexture() },
@@ -90,6 +99,7 @@ function init() {
       scale: {type: "f", value: controls.bumpScale},
       bias: {type: "f", value: controls.bumpBias},
       lightIntensity: {type: "f", value: controls.lightIntensity},
+      heightScale: {type: "f", value: controls.heightScale},
       lightColor: {type: "v3", value: light.color},
       ambientColor: {type: "v3", value: new THREE.Vector3(64.0/255.0,164.0/255.0,223.0/255.0)},
     },
@@ -146,7 +156,7 @@ function init() {
     parallax.uniforms['f_cameraPosition'] = {type: "f", value: camera.position};
     parallax.uniforms['scale'] = {type: "f", value: controls.bumpScale};
     parallax.uniforms['bias'] = {type: "f", value: controls.bumpBias};
-    parallax.opacity = controls.opacity;
+    parallax.uniforms['heightScale'] = {type: "f", value: controls.heightScale};
 
     renderer.render(scene, camera);
     stats.update();
@@ -257,7 +267,7 @@ class Uniforms {
     this.waveHeight = height;
     this.springPower = power;
 
-    console.log('wave: ', this.wavePoint.x, this.wavePoint.y, this.waveHeight, this.springPower);
+    // console.log('wave: ', this.wavePoint.x, this.wavePoint.y, this.waveHeight, this.springPower);
   }
 
   reset() {
