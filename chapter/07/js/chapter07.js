@@ -86,7 +86,6 @@ function init() {
     fragmentShader: loadShaderFile("shader/parallax.fsh"),
     side: THREE.DoubleSide,
     transparent: true,
-    opacity: controls.opacity,
     wireframe: controls.wireframe,
     uniforms:{
       texture0: { type: "t", value: texture },
