@@ -3,21 +3,21 @@
 // varying: fragment shader に送るもの
 // viewMatrix と cameraPosition 送らなくても fsh で使える
 
-varying mat4 vModelMatrix;       // オブジェクト座標からワールド座標へ変換する
-varying mat4 vModelViewMatrix;   // modelMatrixとviewMatrixの積算
-varying mat4 vProjectionMatrix;  // カメラの各種パラメータから３次元を２次元に射影し、クリップ座標系に変換する行列
-varying mat4 vNormalMatrix;      // 頂点法線ベクトルを視点座標系に変換する行列
-varying vec3 vPosition;          // 頂点座標
-varying vec3 vNormal;            // 頂点法線ベクトル
-varying vec2 vUv;                // テクスチャを貼るためのUV座標
+attribute vec4 tangent;
+
+// varying
+varying vec2 vUv;
+varying vec4 vTangent;
+varying vec3 vVertex;
+varying mat4 vModelViewMatrix;
 
 void main() {
-  vUv = uv;
-  vNormal = normal;
-  vPosition = position;
-  vProjectionMatrix = projectionMatrix;
-  vModelViewMatrix = modelViewMatrix;
+    vUv = uv;
+    vTangent = tangent;
+    vModelViewMatrix = modelViewMatrix;
 
-  //gl_Position = vec4(vPosition, 1.0);
-  gl_Position = vProjectionMatrix * vModelViewMatrix * vec4(vPosition, 1.0);
+    vec4 vertex = vec4(position, 1.0);
+    vVertex = vec3(modelViewMatrix * vertex);
+
+    gl_Position = projectionMatrix * modelViewMatrix * vertex;
 }

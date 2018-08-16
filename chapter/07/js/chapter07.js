@@ -37,15 +37,19 @@ function init() {
   // GUI
   var controls = new function () {
       this.lightspeed = 1;
-      this.alpha = 0.86;
-      this.bumpPower = 512.0;
       this.waveSpan = 10;
+      this.opacity = 0.86;
+      this.bumpScale = 1.0;
+      this.bumpBias = 1.0;
+      this.lightIntensity = 1.0;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
-  gui.add(controls, 'alpha', 0.28, 1.0);
-  gui.add(controls, 'bumpPower', 0.1, 2048.0);
   gui.add(controls, 'waveSpan', 1, 100);
+  gui.add(controls, 'opacity', 0.2, 1.0);
+  gui.add(controls, 'bumpScale', 1.5, 64.0);
+  gui.add(controls, 'bumpBias', 1.0, 32.0);
+  gui.add(controls, 'lightIntensity', 0.1, 2.0);
   document.getElementById("GLCanvas").onclick = function() {
     normalMap.addWave();
   };
@@ -67,11 +71,32 @@ function init() {
 
   // side: THREE.DoubleSide 両面 CULL=CCW?
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
-
   var texture = new THREE.TextureLoader().load( '../textures/cubemap/negy.jpg' );
-  var material = new THREE.MeshPhongMaterial({ color: 0x40a4df, map: texture, bumpMap: normalMap.normalTexture(), bumpScale: controls.bumpPower, side: THREE.DoubleSide, transparent: true, opacity: controls.alpha });
-  // var material = new THREE.MeshBasicMaterial({ map: normalMap.normalTexture(), side: THREE.DoubleSide });
-  var plane = new THREE.Mesh( geometry, material );
+
+  var parallax = new THREE.ShaderMaterial({
+    vertexShader: loadShaderFile("shader/vertex.vsh"),
+    fragmentShader: loadShaderFile("shader/parallax.fsh"),
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: controls.opacity,
+    uniforms:{
+      texture0: { type: "t", value: texture },
+      texture1: { type: "t", value: normalMap.normalTexture() },
+      opacity: {type: "f", value: controls.opacity},
+      v_lightPosition: {type: "v3", value: vLightPosition},
+      f_lightPosition: {type: "v3", value: vLightPosition},
+      v_cameraPosition: {type: "v3", value: camera.position},
+      f_cameraPosition: {type: "v3", value: camera.position},
+      scale: {type: "f", value: controls.bumpScale},
+      bias: {type: "f", value: controls.bumpBias},
+      lightIntensity: {type: "f", value: controls.lightIntensity},
+      lightColor: {type: "v3", value: light.color},
+      ambientColor: {type: "v3", value: new THREE.Vector3(64.0/255.0,164.0/255.0,223.0/255.0)},
+    },
+  });
+
+  var material = new THREE.MeshPhongMaterial({ color: 0x40a4df, map: texture, bumpMap: normalMap.normalTexture(), bumpScale: controls.bumpScale, side: THREE.DoubleSide, transparent: true, opacity: controls.opacity });
+  var plane = new THREE.Mesh( geometry, parallax );
   scene.add( plane );
   plane.position.y = -8000;
   plane.rotation.x = Math.PI/2;
@@ -94,9 +119,6 @@ function init() {
 
     //
     normalMap.dynamicNormalMap();
-    material.bumpMap = normalMap.normalTexture();
-    material.opacity = controls.alpha;
-    material.bumpScale = controls.bumpPower;
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
@@ -113,6 +135,18 @@ function init() {
 
     // 光源の位置に設定
     sphereMesh.position.set(vLightPosition.x,vLightPosition.y,vLightPosition.z);
+
+    // progress uniforms
+    parallax.uniforms['texture1'] = { type: "t", value: normalMap.normalTexture() };
+    parallax.uniforms['opacity'] = {type: "f", value: controls.opacity};
+    parallax.uniforms['lightIntensity'] = {type: "f", value: controls.lightIntensity};
+    parallax.uniforms['v_lightPosition'] = {type: "f", value: vLightPosition};
+    parallax.uniforms['f_lightPosition'] = {type: "f", value: vLightPosition};
+    parallax.uniforms['v_cameraPosition'] = {type: "f", value: camera.position};
+    parallax.uniforms['f_cameraPosition'] = {type: "f", value: camera.position};
+    parallax.uniforms['scale'] = {type: "f", value: controls.bumpScale};
+    parallax.uniforms['bias'] = {type: "f", value: controls.bumpBias};
+    parallax.opacity = controls.opacity;
 
     renderer.render(scene, camera);
     stats.update();
