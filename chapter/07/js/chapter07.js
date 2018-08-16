@@ -77,8 +77,7 @@ function init() {
   // SHADER
   var vLightPosition = new THREE.Vector3();
 
-  // side: THREE.DoubleSide 両面 CULL=CCW?
-  var geometry = new THREE.PlaneGeometry( 100000, 100000, 256 );
+  var geometry = new THREE.PlaneGeometry( 100000, 100000, 256, 256 );
   var texture = new THREE.TextureLoader().load( '../textures/cubemap/negy.jpg' );
 
   var parallax = new THREE.ShaderMaterial({
