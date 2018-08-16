@@ -19,12 +19,10 @@ void main() {
     vTangent = tangent;
     vModelViewMatrix = modelViewMatrix;
 
-    float height = texture2D(texture1, uv).w;
-    vec3 p = position;
-    p.z += (height * 0.02);
+    vec4 waveMap = texture2D(texture1, uv);
+    vec3 normal = waveMap.xyz;
+    float height = waveMap.w;
 
-    vec4 vertex = vec4(p, 1.0);
-    vVertex = vec3(modelViewMatrix * vertex);
-
+    vec4 vertex = vec4(normal * (height*heightScale*160.0) + position, 1.0);
     gl_Position = projectionMatrix * modelViewMatrix * vertex;
 }
