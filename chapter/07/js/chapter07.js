@@ -70,7 +70,7 @@ function init() {
   var vLightPosition = new THREE.Vector3();
 
   // side: THREE.DoubleSide 両面 CULL=CCW?
-  var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
+  var geometry = new THREE.PlaneGeometry( 100000, 100000, 1024 );
   var texture = new THREE.TextureLoader().load( '../textures/cubemap/negy.jpg' );
 
   var parallax = new THREE.ShaderMaterial({
