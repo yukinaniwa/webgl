@@ -81,7 +81,7 @@ function init() {
   var texture = new THREE.TextureLoader().load( '../textures/cubemap/negy.jpg' );
 
   var parallax = new THREE.ShaderMaterial({
-    vertexShader: loadShaderFile("shader/vertex.vsh"),
+    vertexShader: loadShaderFile("shader/parallax.vsh"),
     fragmentShader: loadShaderFile("shader/parallax.fsh"),
     side: THREE.DoubleSide,
     transparent: true,
