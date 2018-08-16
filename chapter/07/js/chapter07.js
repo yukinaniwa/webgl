@@ -49,7 +49,7 @@ function init() {
   gui.add(controls, 'opacity', 0.2, 1.0);
   gui.add(controls, 'bumpScale', 1.5, 64.0);
   gui.add(controls, 'bumpBias', 1.0, 32.0);
-  gui.add(controls, 'lightIntensity', 0.1, 2.0);
+  gui.add(controls, 'lightIntensity', 0.1, 4.0);
   document.getElementById("GLCanvas").onclick = function() {
     normalMap.addWave();
   };

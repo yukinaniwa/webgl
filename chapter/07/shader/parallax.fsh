@@ -48,13 +48,14 @@ void main() {
 
   vec3 lightDirection = tsPosition - tsLightPosition;
   //vec3 lightVector = normalize(lightDirection);
-  vec3 diffuse = (lightColor * lightIntensity) * max(dot(lightVector, normal), 0.0);
+  float specular = (dot(normal, lightVector) * 0.5 + 0.5);
+  vec3 diffuse = (lightColor * lightIntensity) * (specular*specular*specular);
   vec3 ambient = ambientColor * lightIntensity;
   vec3 intensity = ambient + diffuse;
 
   float lambert = dot(lightVector, normal) * 0.5 + 0.5;
 
-  //gl_FragColor = vec4(vec3(intensity), 1.0);
+  //gl_FragColor = vec4(vec3(specular), 1.0);
   //gl_FragColor = vec4(vec3(color.rgb), 1.0);
   gl_FragColor = vec4(color.rgb * intensity, opacity);
 }
