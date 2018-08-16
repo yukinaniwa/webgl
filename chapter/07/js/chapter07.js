@@ -107,7 +107,7 @@ function init() {
   var material = new THREE.MeshPhongMaterial({ color: 0x40a4df, map: texture, bumpMap: normalMap.normalTexture(), bumpScale: controls.bumpScale, side: THREE.DoubleSide, transparent: true, opacity: controls.opacity });
   var plane = new THREE.Mesh( geometry, parallax );
   scene.add( plane );
-  plane.position.y = -8000;
+  plane.position.y = -2000;
   plane.rotation.x = Math.PI/2;
 
   //
