@@ -52,7 +52,7 @@ function init() {
   gui.add(controls, 'bumpScale', 1.0, 64.0);
   gui.add(controls, 'bumpBias', 1.0, 32.0);
   gui.add(controls, 'lightIntensity', 0.1, 4.0);
-  gui.add(controls, 'heightScale', 0.0, 64.0);
+  gui.add(controls, 'heightScale', 0.0, 100.0);
   gui.add(controls, 'wireframe').onChange(changeWireFrame);
   function changeWireFrame() {
     parallax.wireframe = controls.wireframe;
