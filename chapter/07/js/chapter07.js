@@ -38,18 +38,18 @@ function init() {
   var controls = new function () {
       this.lightspeed = 1;
       this.waveSpan = 10;
-      this.opacity = 0.86;
-      this.bumpScale = 1.0;
-      this.bumpBias = 1.0;
-      this.lightIntensity = 1.0;
+      this.opacity = 0.8;
+      this.bumpScale = 24.0;
+      this.bumpBias = 8.0;
+      this.lightIntensity = 1.6;
       this.heightScale = 0.0;
       this.wireframe = false;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
-  gui.add(controls, 'waveSpan', 1, 100);
+  gui.add(controls, 'waveSpan', 1, 50);
   gui.add(controls, 'opacity', 0.2, 1.0);
-  gui.add(controls, 'bumpScale', 1.5, 64.0);
+  gui.add(controls, 'bumpScale', 1.0, 64.0);
   gui.add(controls, 'bumpBias', 1.0, 32.0);
   gui.add(controls, 'lightIntensity', 0.1, 4.0);
   gui.add(controls, 'heightScale', 0.0, 64.0);
@@ -63,7 +63,7 @@ function init() {
   };
 
   // light
-  const light = new THREE.DirectionalLight(0xFFFFFF);
+  const light = new THREE.DirectionalLight(0xFFFFBB);
   light.intensity = 1.0;
   light.position.set(1, 3, 2);
   scene.add(light);
