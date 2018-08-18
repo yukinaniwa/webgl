@@ -63,7 +63,7 @@ function init() {
   };
 
   // light
-  const light = new THREE.DirectionalLight(0xFFFFBB);
+  const light = new THREE.DirectionalLight(0xFFFFFF);
   light.intensity = 1.0;
   light.position.set(1, 3, 2);
   scene.add(light);
@@ -78,7 +78,7 @@ function init() {
   var vLightPosition = new THREE.Vector3();
 
   var geometry = new THREE.PlaneGeometry( 100000, 100000, 256, 256 );
-  var texture = new THREE.TextureLoader().load( '../textures/cubemap/negy.jpg' );
+  var texture = new THREE.TextureLoader().load( '../textures/cubemap/posy.jpg' );
 
   var parallax = new THREE.ShaderMaterial({
     vertexShader: loadShaderFile("shader/parallax.vsh"),
