@@ -37,7 +37,6 @@ function init() {
   // GUI
   var controls = new function () {
       this.lightspeed = 1;
-      this.genWave = 1;
       this.waveSpan = 10;
       this.opacity = 0.8;
       this.bumpScale = 24.0;
@@ -48,7 +47,6 @@ function init() {
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
-  gui.add(controls, 'genWave', 1, 126);
   gui.add(controls, 'waveSpan', 1, 50);
   gui.add(controls, 'opacity', 0.2, 1.0);
   gui.add(controls, 'bumpScale', 1.0, 64.0);
@@ -115,9 +113,7 @@ function init() {
   tick();
 
   function generateWave() {
-    for( var i = 0; i < controls.genWave; i++ ) {
-      normalMap.addWave();
-    }
+    normalMap.addWave();
   }
 
   function tick() {
@@ -312,6 +308,7 @@ class NormalMap {
 
   addWave() {
     this.shader.uniforms.set();
+    this.dynamicNormalMap();
   }
 
   normalTexture() {
