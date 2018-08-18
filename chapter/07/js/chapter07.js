@@ -42,7 +42,7 @@ function init() {
       this.bumpScale = 24.0;
       this.bumpBias = 8.0;
       this.lightIntensity = 1.6;
-      this.heightScale = 0.0;
+      this.heightScale = 20.0;
       this.wireframe = false;
   };
   var gui = new dat.GUI( { autoPlace: true } );

@@ -43,7 +43,7 @@ void main() {
   vec3 tsEyePosition = TBN * (vCameraPosition - vVertex);
 
   vec2 eyeVector = normalize(tsEyePosition.xy);
-  fUv = vUv;// + height;// + (eyeVector * height);
+  fUv = vUv + (height*0.001);// + (eyeVector * height);
   color = texture2D(texture0, fUv);
 
   vec3 lightDirection = tsPosition - tsLightPosition;
