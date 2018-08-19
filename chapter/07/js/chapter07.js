@@ -103,21 +103,18 @@ function init() {
     },
   });
 
-  var material = new THREE.MeshPhongMaterial({ color: 0x40a4df, map: texture, bumpMap: normalMap.normalTexture(), bumpScale: controls.bumpScale, side: THREE.DoubleSide, transparent: true, opacity: controls.opacity });
   var plane = new THREE.Mesh( geometry, parallax );
   scene.add( plane );
   plane.position.y = 0;
   plane.rotation.x = Math.PI/2;
 
+  addGround(geometry);
+
   //
-  tick();
+  progress();
 
-  function generateWave() {
-    normalMap.addWave();
-  }
-
-  function tick() {
-    requestAnimationFrame(tick);
+  function progress() {
+    requestAnimationFrame(progress);
 
     progress_timer += (0.016*controls.lightspeed);
 
@@ -163,6 +160,45 @@ function init() {
     renderer.render(scene, camera);
     stats.update();
   }
+
+  ////
+  function generateWave() {
+    normalMap.addWave();
+  }
+
+  ////
+  function addGround(bottomGeometry) {
+    var geometryPlane = new THREE.PlaneGeometry( 100000, 30000, 2, 2 );
+    var material = new THREE.MeshPhongMaterial({ color: 0x4C4C4C, side: THREE.DoubleSide });
+
+    var bottomPlane = new THREE.Mesh( bottomGeometry, material );
+    scene.add( bottomPlane );
+    bottomPlane.position.y = -20000;
+    bottomPlane.rotation.x = Math.PI/2;
+
+    var nearPlane = new THREE.Mesh( geometryPlane, material );
+    scene.add( nearPlane );
+    nearPlane.position.y = -5000;
+    nearPlane.position.z = -50000;
+
+    var farPlane = new THREE.Mesh( geometryPlane, material );
+    scene.add( farPlane );
+    farPlane.position.y = -5000;
+    farPlane.position.z = 50000;
+
+    var leftPlane = new THREE.Mesh( geometryPlane, material );
+    scene.add( leftPlane );
+    leftPlane.position.y = -5000;
+    leftPlane.position.x = 50000;
+    leftPlane.rotation.y = Math.PI/2;
+
+    var rightPlane = new THREE.Mesh( geometryPlane, material );
+    scene.add( rightPlane );
+    rightPlane.position.y = -5000;
+    rightPlane.position.x = -50000;
+    rightPlane.rotation.y = Math.PI/2;
+  }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
