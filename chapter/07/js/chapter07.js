@@ -37,13 +37,13 @@ function init() {
   // GUI
   var controls = new function () {
       this.lightspeed = 1;
-      this.waveSpan = 10;
-      this.opacity = 0.8;
+      this.waveSpan = 1;
+      this.opacity = 0.3;
       this.bumpScale = 24.0;
-      this.bumpBias = 8.0;
-      this.lightIntensity = 1.6;
+      this.bumpBias = 1.0;
+      this.lightIntensity = 3.2;
       this.heightScale = 20.0;
-      this.wireframe = false;
+      this.wireframe = true;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
@@ -77,7 +77,7 @@ function init() {
   // SHADER
   var vLightPosition = new THREE.Vector3();
 
-  var geometry = new THREE.PlaneGeometry( 100000, 100000, 256, 256 );
+  var geometry = new THREE.PlaneGeometry( 50000, 50000, 320, 320 );
   var texture = new THREE.TextureLoader().load( '../textures/cubemap/posy.jpg' );
 
   var parallax = new THREE.ShaderMaterial({
@@ -108,7 +108,7 @@ function init() {
   plane.position.y = 0;
   plane.rotation.x = Math.PI/2;
 
-  addGround(geometry);
+  // addGround(geometry);
 
   //
   progress();
@@ -287,18 +287,21 @@ class Shader {
 */
 class Uniforms {
   constructor(bufferWidth, bufferHeight) {
-    this.waveHeight = 0.73;
-    this.springPower = 0.95;
-    this.wavePoint = new THREE.Vector2( -1.0 , -1.0 );
+    var x = (Math.random()%100) * 1.0;
+    var y = (Math.random()%100) * 1.0;
+    var height = ((Math.random()%100)*100-50) * 0.002;
+
+    this.waveHeight = height;
+    this.springPower = 0.2;
+    this.wavePoint = new THREE.Vector2( x , y );
     this.textureOffset = new THREE.Vector2( 1.0/bufferWidth, 1.0/bufferHeight );
   }
 
   set() {
-
     var x = (Math.random()%100) * 1.0;
     var y = (Math.random()%100) * 1.0;
-    var height = ((Math.random()%100)*2.0-1.0) * 1.086;
-    var power = (Math.random()%100) * 1.13;
+    var height = ((Math.random()%100)*100-50) * 0.002;
+    var power = (Math.random()%100) * 2.6;
 
     this.wavePoint.x = x;
     this.wavePoint.y = y;
@@ -309,10 +312,6 @@ class Uniforms {
   }
 
   reset() {
-    this.wavePoint.x = -1;
-    this.wavePoint.y = -1;
-    this.waveHeight = 0;
-    this.springPower = 0;
   }
 }
 
