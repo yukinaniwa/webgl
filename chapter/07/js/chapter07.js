@@ -36,23 +36,25 @@ function init() {
 
   // GUI
   var controls = new function () {
-      this.lightspeed = 1;
+      this.lightspeed = 0.2;
       this.waveSpan = 1;
-      this.opacity = 0.3;
-      this.bumpScale = 24.0;
-      this.bumpBias = 1.0;
-      this.lightIntensity = 3.2;
-      this.heightScale = 20.0;
+      this.opacity = 0.86;
+      this.normalScale = 1.0;
+      this.maxHeightBias = 0.016;
+      this.specular = 1.0;
+      this.specularPower = 1.0;
+      this.heightScale = 1.0;
       this.wireframe = true;
   };
   var gui = new dat.GUI( { autoPlace: true } );
   gui.add(controls, 'lightspeed', 0.0, 6.0);
   gui.add(controls, 'waveSpan', 1, 50);
   gui.add(controls, 'opacity', 0.2, 1.0);
-  gui.add(controls, 'bumpScale', 1.0, 64.0);
-  gui.add(controls, 'bumpBias', 1.0, 32.0);
-  gui.add(controls, 'lightIntensity', 0.1, 4.0);
-  gui.add(controls, 'heightScale', 0.0, 100.0);
+  gui.add(controls, 'normalScale', 1.0, 128.0);
+  gui.add(controls, 'maxHeightBias', 0.0, 0.25);
+  gui.add(controls, 'specular', 0.1, 128.0);
+  gui.add(controls, 'specularPower', 0.0, 8.0);
+  gui.add(controls, 'heightScale', 1.0, 256.0);
   gui.add(controls, 'wireframe').onChange(changeWireFrame);
   function changeWireFrame() {
     parallax.wireframe = controls.wireframe;
@@ -89,17 +91,14 @@ function init() {
     uniforms:{
       texture0: { type: "t", value: texture },
       texture1: { type: "t", value: normalMap.normalTexture() },
-      opacity: {type: "f", value: controls.opacity},
       v_lightPosition: {type: "v3", value: vLightPosition},
-      f_lightPosition: {type: "v3", value: vLightPosition},
-      v_cameraPosition: {type: "v3", value: camera.position},
-      f_cameraPosition: {type: "v3", value: camera.position},
-      scale: {type: "f", value: controls.bumpScale},
-      bias: {type: "f", value: controls.bumpBias},
-      lightIntensity: {type: "f", value: controls.lightIntensity},
+      opacity: {type: "f", value: controls.opacity},
+      normalScale: {type: "f", value: controls.normalScale},
+      ambientColor: {type: "v3", value: new THREE.Vector3(1.0,1.0,1.0)},
+      maxHeightBias: {type: "f", value: controls.maxHeightBias},
+      specular: {type: "f", value: controls.specular},
+      specularPower: {type: "f", value: controls.specularPower},
       heightScale: {type: "f", value: controls.heightScale},
-      lightColor: {type: "v3", value: light.color},
-      ambientColor: {type: "v3", value: new THREE.Vector3(64.0/255.0,164.0/255.0,223.0/255.0)},
     },
   });
 
@@ -147,14 +146,13 @@ function init() {
 
     // progress uniforms
     parallax.uniforms['texture1'] = { type: "t", value: normalMap.normalTexture() };
-    parallax.uniforms['opacity'] = {type: "f", value: controls.opacity};
-    parallax.uniforms['lightIntensity'] = {type: "f", value: controls.lightIntensity};
     parallax.uniforms['v_lightPosition'] = {type: "f", value: vLightPosition};
-    parallax.uniforms['f_lightPosition'] = {type: "f", value: vLightPosition};
-    parallax.uniforms['v_cameraPosition'] = {type: "f", value: camera.position};
-    parallax.uniforms['f_cameraPosition'] = {type: "f", value: camera.position};
-    parallax.uniforms['scale'] = {type: "f", value: controls.bumpScale};
-    parallax.uniforms['bias'] = {type: "f", value: controls.bumpBias};
+    parallax.uniforms['opacity'] = {type: "f", value: controls.opacity};
+    parallax.uniforms['normalScale'] = {type: "f", value: controls.normalScale};
+    // parallax.uniforms['ambientColor'] = {type: "v3", value: controls.ambientColor};
+    parallax.uniforms['maxHeightBias'] = {type: "f", value: controls.maxHeightBias};
+    parallax.uniforms['specular'] = {type: "f", value: controls.specular};
+    parallax.uniforms['specularPower'] = {type: "f", value: controls.specularPower};
     parallax.uniforms['heightScale'] = {type: "f", value: controls.heightScale};
 
     renderer.render(scene, camera);
@@ -287,13 +285,9 @@ class Shader {
 */
 class Uniforms {
   constructor(bufferWidth, bufferHeight) {
-    var x = (Math.random()%100) * 1.0;
-    var y = (Math.random()%100) * 1.0;
-    var height = ((Math.random()%100)*100-50) * 0.002;
+    this.wavePoint = new THREE.Vector2( 0.0, 0.0 );
 
-    this.waveHeight = height;
-    this.springPower = 0.2;
-    this.wavePoint = new THREE.Vector2( x , y );
+    this.set();
     this.textureOffset = new THREE.Vector2( 1.0/bufferWidth, 1.0/bufferHeight );
   }
 
@@ -301,7 +295,7 @@ class Uniforms {
     var x = (Math.random()%100) * 1.0;
     var y = (Math.random()%100) * 1.0;
     var height = ((Math.random()%100)*100-50) * 0.002;
-    var power = (Math.random()%100) * 2.6;
+    var power = 0.2;
 
     this.wavePoint.x = x;
     this.wavePoint.y = y;
@@ -346,6 +340,16 @@ class NormalMap {
     this.dynamicNormalMap();
   }
 
+  waveUniforms() {
+    this.shader.heightMap[0].uniforms['springPower'] = {type: "f", value: this.shader.uniforms.springPower};
+    this.shader.heightMap[0].uniforms['addWavePos'] = {type: "v2", value: this.shader.uniforms.wavePoint};
+    this.shader.heightMap[0].uniforms['addWaveHeight'] = {type: "f", value: this.shader.uniforms.waveHeight};
+
+    this.shader.heightMap[1].uniforms['springPower'] = {type: "f", value: this.shader.uniforms.springPower};
+    this.shader.heightMap[1].uniforms['addWavePos'] = {type: "v2", value: this.shader.uniforms.wavePoint};
+    this.shader.heightMap[1].uniforms['addWaveHeight'] = {type: "f", value: this.shader.uniforms.waveHeight};
+  }
+
   normalTexture() {
     return this.renderTarget.normalTexture();
   }
@@ -371,6 +375,7 @@ class NormalMap {
       this.progress_timer = 0.0;
     }
 
+    this.waveUniforms();
     this.renderBuffer();
 
     // setting reset
