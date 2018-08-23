@@ -3,15 +3,12 @@
 // varying: fragment shader に送るもの
 // viewMatrix と cameraPosition 送らなくても fsh で使える
 
-attribute vec4 tangent;
-
 uniform sampler2D texture1;
 uniform float heightScale;
 uniform vec3 v_lightPosition;
 
 // varying
 varying vec2 vUv;
-varying vec4 vTangent;
 varying vec3 vVertex;
 varying mat4 vModelViewMatrix;
 varying vec3 vEyePosition;

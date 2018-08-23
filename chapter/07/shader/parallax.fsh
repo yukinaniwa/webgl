@@ -4,7 +4,6 @@
 precision mediump float;
 
 varying vec2 vUv;
-varying vec4 vTangent;
 varying vec3 vVertex;
 varying mat4 vModelViewMatrix;
 
