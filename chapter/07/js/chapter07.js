@@ -40,7 +40,7 @@ function init() {
       this.waveSpan = 25;
       this.opacity = 0.86;
       this.normalScale = 1.0;
-      this.maxHeightBias = 0.016;
+      this.maxHeightBias = 2.4;
       this.specular = 16;
       this.specularPower = 0.8;
       this.heightScale = 1.0;
@@ -50,8 +50,8 @@ function init() {
   gui.add(controls, 'lightspeed', 0.0, 6.0);
   gui.add(controls, 'waveSpan', 1, 50);
   gui.add(controls, 'opacity', 0.2, 1.0);
-  gui.add(controls, 'normalScale', 1.0, 24.0);
-  gui.add(controls, 'maxHeightBias', 0.0, 20.25);
+  // gui.add(controls, 'normalScale', 1.0, 24.0);
+  // gui.add(controls, 'maxHeightBias', 0.0, 0.25);
   gui.add(controls, 'specular', 1, 32);
   gui.add(controls, 'specularPower', 0.0, 2.0);
   gui.add(controls, 'heightScale', 0.0, 8.0);

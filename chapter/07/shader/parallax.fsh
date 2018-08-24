@@ -27,8 +27,8 @@ void main() {
   vec4 waveMap = texture2D(texture1, vUv);
   vec4 albedo = texture2D(texture0, vUv);
 
-  float height = waveMap.w * normalScale + maxHeightBias;
-  vec2 tex = vUv * height * vEyePosition.xy;
+  float height = waveMap.w * normalScale;
+  vec2 tex = vUv + maxHeightBias * height * vEyePosition.xy;
 
   vec3 normal = 2.0 * waveMap.xyz - 1.0;
 
