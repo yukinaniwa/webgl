@@ -27,14 +27,15 @@ void main() {
   vec4 waveMap = texture2D(texture1, vUv);
   vec4 albedo = texture2D(texture0, vUv);
 
-  float height = waveMap.w * normalScale;
-  vec2 tex = vUv + maxHeightBias * height * vEyePosition.xy;
+  float height = waveMap.w * normalScale + maxHeightBias;
+  vec2 tex = vUv * height * vEyePosition.xy;
 
   vec3 normal = 2.0 * waveMap.xyz - 1.0;
 
-  vec3 H = normalize( vLightPosition + vEyePosition );
+  vec3 H = normalize(vLightPosition+vEyePosition);
 
-  float s = pow(max(0.0, dot( normal, H ) ), specular) * specularPower;
+  float HL = dot(normal, H) * 0.5 + 0.5;
+  float s = pow(HL, specular) * specularPower;
 
   vec3 result = albedo.rgb * max(ambientColor, dot( normal, vLightPosition)) + s;
   gl_FragColor = vec4(result, opacity);

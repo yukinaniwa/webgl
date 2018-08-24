@@ -22,10 +22,10 @@ void main() {
     // T B N
     vec3 normal = waveMap.xyz;
     vec3 tangent = normalize(cross(normal, vec3(0.0, 1.0, 0.0)));
-    vec3 binormal = normalize( cross(normal, tangent) * 1.0 );
+    vec3 binormal = normalize( cross(normal, tangent));
 
     // calc eye vector
-    vec3 eye = normalize(cameraPosition.xyz - position.xyz);
+    vec3 eye = cameraPosition.xyz - position.xyz;
     vEyePosition.x = dot(eye, tangent);
     vEyePosition.y = dot(eye, binormal);
     vEyePosition.z = dot(eye, normal);
@@ -41,6 +41,6 @@ void main() {
     // displacement mapping
     float height = 1.0-waveMap.w;
 
-    vec4 vertex = vec4(normal * ((height*height*height)*heightScale*1024.0) + position, 1.0);
+    vec4 vertex = vec4(normal * ((height)*heightScale*1024.0) + position, 1.0);
     gl_Position = projectionMatrix * modelViewMatrix * vertex;
 }
