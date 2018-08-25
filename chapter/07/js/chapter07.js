@@ -36,7 +36,7 @@ function init() {
 
   // GUI
   var controls = new function () {
-      this.lightspeed = 0.0;
+      this.lightspeed = 1.5;
       this.waveSpan = 25;
       this.opacity = 0.86;
       this.normalScale = 1.0;
