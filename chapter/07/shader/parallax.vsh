@@ -32,7 +32,7 @@ void main() {
     vEyePosition = normalize(vEyePosition);
 
     // calc light vector
-    vec3 light = -v_lightPosition.xyz;
+    vec3 light = v_lightPosition.xyz - position.xyz;
     vLightPosition.x = dot(light, tangent);
     vLightPosition.y = dot(light, binormal);
     vLightPosition.z = dot(light, normal);

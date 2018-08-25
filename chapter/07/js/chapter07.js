@@ -9,7 +9,7 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 60000, -4000);
+  const camera = initCamera(width, height, 215.65, 12533.44, -65900.42);
   initCameraControls(renderer, camera, 0, 0, 0);
   const stats = attachFpsView()
 
@@ -36,7 +36,7 @@ function init() {
 
   // GUI
   var controls = new function () {
-      this.lightspeed = 0.2;
+      this.lightspeed = 0.0;
       this.waveSpan = 25;
       this.opacity = 0.86;
       this.normalScale = 1.0;
@@ -53,8 +53,8 @@ function init() {
   // gui.add(controls, 'normalScale', 1.0, 24.0);
   // gui.add(controls, 'maxHeightBias', 0.0, 0.25);
   gui.add(controls, 'specular', 1, 32);
-  gui.add(controls, 'specularPower', 0.0, 2.0);
-  gui.add(controls, 'heightScale', 0.0, 8.0);
+  gui.add(controls, 'specularPower', 0.0, 3.0);
+  gui.add(controls, 'heightScale', 0.0, 10.0);
   gui.add(controls, 'wireframe').onChange(changeWireFrame);
   function changeWireFrame() {
     parallax.wireframe = controls.wireframe;
@@ -94,7 +94,7 @@ function init() {
       v_lightPosition: {type: "v3", value: vLightPosition},
       opacity: {type: "f", value: controls.opacity},
       normalScale: {type: "f", value: controls.normalScale},
-      ambientColor: {type: "v3", value: new THREE.Vector3(1.0,1.0,1.0)},
+      ambientColor: {type: "v3", value: new THREE.Vector3(23.0/255.0,96.0/255.0,45.0/255.0)},
       maxHeightBias: {type: "f", value: controls.maxHeightBias},
       specular: {type: "f", value: controls.specular},
       specularPower: {type: "f", value: controls.specularPower},
@@ -130,7 +130,8 @@ function init() {
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
-    mTrans.makeTranslation(60000, 30000, 0);
+    mTrans.makeTranslation(40000, 30000, 0);
+    // mTrans.makeTranslation(0, 30000, 0);
 
     // 回転行列を作成
     var mRotate = new THREE.Matrix4();
@@ -140,6 +141,7 @@ function init() {
     // 移動成分を抽出する
     var mLightPosition = mRotate.multiply(mTrans);
     vLightPosition.setFromMatrixPosition(mLightPosition);
+    // console.log('pos: ', camera.position);
 
     // 光源の位置に設定
     sphereMesh.position.set(vLightPosition.x,vLightPosition.y,vLightPosition.z);

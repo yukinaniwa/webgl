@@ -34,10 +34,12 @@ void main() {
 
   vec3 H = normalize(vLightPosition+vEyePosition);
 
-  float HL = dot(normal, H) * 0.5 + 0.5;
+  float HL = dot(H, normal) * 0.5 + 0.5;
+  float HA = dot(normal, vLightPosition) * 0.5 + 0.5;
   float s = pow(HL, specular) * specularPower;
+  vec3 ambient = max(ambientColor, HA);
 
-  vec3 result = albedo.rgb * max(ambientColor, dot( normal, vLightPosition)) + s;
-  gl_FragColor = vec4(result, opacity);
+  vec3 finalColor = albedo.rgb * ambient.rgb + s;
+  gl_FragColor = vec4(finalColor, opacity);
 
 }
