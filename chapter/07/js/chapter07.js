@@ -43,7 +43,7 @@ function init() {
       this.maxHeightBias = 2.4;
       this.specular = 16;
       this.specularPower = 0.8;
-      this.heightScale = 1.0;
+      this.heightScale = 3.0;
       this.wireframe = false;
   };
   var gui = new dat.GUI( { autoPlace: true } );
@@ -106,6 +106,9 @@ function init() {
   scene.add( plane );
   plane.position.y = 0;
   plane.rotation.x = Math.PI/2;
+
+  plane.scale.x = 1;
+  plane.scale.y = 1;
 
   // addGround(geometry);
 
