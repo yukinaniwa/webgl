@@ -110,8 +110,6 @@ function init() {
   plane.scale.x = 1;
   plane.scale.y = 1;
 
-  // addGround(geometry);
-
   //
   progress();
 
@@ -166,39 +164,6 @@ function init() {
   ////
   function generateWave() {
     normalMap.addWave();
-  }
-
-  ////
-  function addGround(bottomGeometry) {
-    var geometryPlane = new THREE.PlaneGeometry( 100000, 30000, 2, 2 );
-    var material = new THREE.MeshPhongMaterial({ color: 0x4C4C4C, side: THREE.DoubleSide });
-
-    var bottomPlane = new THREE.Mesh( bottomGeometry, material );
-    scene.add( bottomPlane );
-    bottomPlane.position.y = -20000;
-    bottomPlane.rotation.x = Math.PI/2;
-
-    var nearPlane = new THREE.Mesh( geometryPlane, material );
-    scene.add( nearPlane );
-    nearPlane.position.y = -5000;
-    nearPlane.position.z = -50000;
-
-    var farPlane = new THREE.Mesh( geometryPlane, material );
-    scene.add( farPlane );
-    farPlane.position.y = -5000;
-    farPlane.position.z = 50000;
-
-    var leftPlane = new THREE.Mesh( geometryPlane, material );
-    scene.add( leftPlane );
-    leftPlane.position.y = -5000;
-    leftPlane.position.x = 50000;
-    leftPlane.rotation.y = Math.PI/2;
-
-    var rightPlane = new THREE.Mesh( geometryPlane, material );
-    scene.add( rightPlane );
-    rightPlane.position.y = -5000;
-    rightPlane.position.x = -50000;
-    rightPlane.rotation.y = Math.PI/2;
   }
 
 }
