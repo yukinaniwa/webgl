@@ -19,7 +19,7 @@ void main() {
     vModelViewMatrix = modelViewMatrix;
     vec4 waveMap = texture2D(texture1, uv);
 
-    // T B N
+    // TBN parameters
     vec3 normal = waveMap.xyz;
     vec3 tangent = normalize(cross(normal, vec3(0.0, 1.0, 0.0)));
     vec3 binormal = normalize( cross(normal, tangent));
@@ -41,6 +41,6 @@ void main() {
     // displacement mapping
     float height = 1.0-waveMap.w;
 
-    vec4 vertex = vec4(normal * ((height)*heightScale*1024.0) + position, 1.0);
+    vec4 vertex = vec4(normal * (height*heightScale*1024.0) + position, 1.0);
     gl_Position = projectionMatrix * modelViewMatrix * vertex;
 }
