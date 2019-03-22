@@ -154,7 +154,6 @@ function init() {
     parallax.uniforms['v_lightPosition'] = {type: "f", value: vLightPosition};
     parallax.uniforms['opacity'] = {type: "f", value: controls.opacity};
     parallax.uniforms['normalScale'] = {type: "f", value: controls.normalScale};
-    // parallax.uniforms['ambientColor'] = {type: "v3", value: controls.ambientColor};
     parallax.uniforms['maxHeightBias'] = {type: "f", value: controls.maxHeightBias};
     parallax.uniforms['specular'] = {type: "f", value: controls.specular};
     parallax.uniforms['specularPower'] = {type: "f", value: controls.specularPower};

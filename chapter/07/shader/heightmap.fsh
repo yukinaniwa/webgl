@@ -31,6 +31,7 @@ void main(){
       v += addWaveHeight;
     }
 
+    // 係数をもとに補正
     h = h - h*0.0086;
     v = v - v*0.0048;
 

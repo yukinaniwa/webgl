@@ -30,6 +30,7 @@ void main() {
   float height = waveMap.w * normalScale;
   vec2 tex = vUv + maxHeightBias * height * vEyePosition.xy;
 
+  // normal range [0.0-1.0]
   vec3 normal = 2.0 * waveMap.xyz - 1.0;
 
   vec3 H = normalize(vLightPosition+vEyePosition);
