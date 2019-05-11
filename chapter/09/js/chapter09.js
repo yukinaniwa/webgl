@@ -130,11 +130,7 @@ function init() {
     var mLightPosition = mRotate.multiply(mTrans);
     vLightPosition.setFromMatrixPosition(mLightPosition);
 
-    if( controls.isDebugColorMode ) {
-      stealthShader.uniforms['objColor'] = { type: "v3", value: new THREE.Vector3(0.08, 0.5, 0.109) };
-    } else {
-      stealthShader.uniforms['objColor'] = { type: "v3", value: new THREE.Vector3(1, 1, 1) };
-    }
+    stealthShader.uniforms['isObjColor'] = { type: "bool", value: controls.isDebugColorMode };
     stealthShader.uniforms['coefficient'] = { type: "float", value: controls.coefRefractive};
     stealthShader.uniforms['texture0'] = { type: "t", value: renderTargetMap.texture };
 
