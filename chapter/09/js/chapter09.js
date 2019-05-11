@@ -21,7 +21,7 @@ function init() {
   var renderTargetMap = renderTarget.capture(renderer);
 
   var cubeTexture = new THREE.CubeTextureLoader()
-  	.setPath('../textures/cubemap/')
+  	.setPath('../textures/cubemap/chapel/')
   	.load( [
   		'posx.jpg',
   		'negx.jpg',
