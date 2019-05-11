@@ -64,6 +64,14 @@ function init() {
     generateWave();
   };
 
+  /*
+    velocity map motion blur
+    前回のフレームと今のフレームの worldMatrix を保持する
+    各 worldMatrix を GLSL に送り、その差分を可視化して、色情報として書き込む
+    書き込んだ色情報から、ベクトルの報告に gaussian blur をして、最終的な
+    出力をする
+  */
+  
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
   light.intensity = 1.0;
