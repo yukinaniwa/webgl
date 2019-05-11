@@ -9,7 +9,7 @@ function init() {
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 100, -400);
+  const camera = initCamera(width, height, 0, 50, -200);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
@@ -35,10 +35,12 @@ function init() {
   // GUI
   var controls = new function () {
       this.lightspeed = 1;
-      this.coefficient = 0.0;
+      this.coefRefractive = 0.0;
+      this.isDebugColorMode = false;
   };
   var gui = new dat.GUI( { autoPlace: true } );
-  gui.add(controls, 'coefficient', -1.0, 1.0);
+  gui.add(controls, 'coefRefractive', -3.0, 3.0);
+  gui.add(controls, 'isDebugColorMode');
 
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
@@ -59,43 +61,48 @@ function init() {
   var vLightPosition = new THREE.Vector3();
   var texture = new THREE.TextureLoader().load( '../textures/cubemap/posy.jpg' );
 
-  var rimPower = new THREE.Vector3();
-  let rimLighting = new THREE.ShaderMaterial({
+  let stealthShader = new THREE.ShaderMaterial({
     vertexShader: loadShaderFile("shader/vertex.vsh"),
     fragmentShader: loadShaderFile("shader/stealth.fsh"),
     uniforms:{
       texture0: { type: "t", value: texture },
       lightPos: {type: "v3", value: vLightPosition},
       cameraPos: {type: "v3", value: camera.position},
+      objColor: { type: "v3", value: new THREE.Vector3(1, 1, 1) },
       coefficient: { type: "float", value: controls.coefficient },
     },
-    side: THREE.DoubleSide,
+    // side: THREE.DoubleSide,
   });
 
   // COLLADA
   const loader = new THREE.ColladaLoader();
-  var colladaModel;
+  var bunnyModel;
   loader.load('../models/bunny.dae', (collada) => {
-    colladaModel = collada.scene;
-    colladaModel.scale.set(32,32,32);
-    colladaModel.position.set(0,0,0);
+    bunnyModel = collada.scene;
+    bunnyModel.scale.set(50,50,50);
+    bunnyModel.position.set(-50,0,0);
 
-    colladaModel.children.forEach(function(childModel) {
-      childModel.material = rimLighting;
+    bunnyModel.children.forEach(function(childModel) {
+      childModel.material = stealthShader;
     });
 
-    scene.add(colladaModel);
+    scene.add(bunnyModel);
   });
 
-  // side: THREE.DoubleSide 両面 CULL=CCW?
-  // var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
-  // var material = new THREE.MeshBasicMaterial({ map: renderTargetMap.texture, side: THREE.DoubleSide });
-  // var plane = new THREE.Mesh( geometry, rimLighting );
-  // scene.add( plane );
-  // plane.position.y = -8000;
-  // plane.rotation.x = Math.PI/2;
+  var dragonModel;
+  loader.load('../models/dragon.dae', (collada) => {
+    dragonModel = collada.scene;
+    dragonModel.scale.set(50,50,50);
+    dragonModel.position.set(50,0,0);
 
-  //
+    dragonModel.children.forEach(function(childModel) {
+      childModel.material = stealthShader;
+    });
+
+    scene.add(dragonModel);
+  });
+
+  // render progress
   tick();
 
   function tick() {
@@ -123,8 +130,13 @@ function init() {
     var mLightPosition = mRotate.multiply(mTrans);
     vLightPosition.setFromMatrixPosition(mLightPosition);
 
-    rimLighting.uniforms['coefficient'] = { type: "float", value: (controls.coefficient - 100.0) / 100.0 };
-    rimLighting.uniforms['texture0'] = { type: "t", value: renderTargetMap.texture };
+    if( controls.isDebugColorMode ) {
+      stealthShader.uniforms['objColor'] = { type: "v3", value: new THREE.Vector3(0.08, 0.5, 0.109) };
+    } else {
+      stealthShader.uniforms['objColor'] = { type: "v3", value: new THREE.Vector3(1, 1, 1) };
+    }
+    stealthShader.uniforms['coefficient'] = { type: "float", value: controls.coefRefractive};
+    stealthShader.uniforms['texture0'] = { type: "t", value: renderTargetMap.texture };
 
     // 光源の位置に設定
     sphereMesh.position.set(vLightPosition.x,vLightPosition.y,vLightPosition.z);
