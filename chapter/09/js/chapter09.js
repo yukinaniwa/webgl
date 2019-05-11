@@ -14,6 +14,7 @@ function init() {
   const stats = attachFpsView()
 
   var progress_timer = 0;
+  var checkBuffer = 0;
 
   // RENDER TARGET
   var renderTarget = new RenderTarget(width, height, scene, camera);
@@ -34,9 +35,10 @@ function init() {
   // GUI
   var controls = new function () {
       this.lightspeed = 1;
+      this.coefficient = 0.0;
   };
   var gui = new dat.GUI( { autoPlace: true } );
-  gui.add(controls, 'lightspeed', 0.0, 6.0);
+  gui.add(controls, 'coefficient', -1.0, 1.0);
 
   // light
   const light = new THREE.DirectionalLight(0xFFFFFF);
@@ -65,8 +67,9 @@ function init() {
       texture0: { type: "t", value: texture },
       lightPos: {type: "v3", value: vLightPosition},
       cameraPos: {type: "v3", value: camera.position},
-      rimPower: {type: "v3", value: rimPower},
+      coefficient: { type: "float", value: controls.coefficient },
     },
+    side: THREE.DoubleSide,
   });
 
   // COLLADA
@@ -74,7 +77,7 @@ function init() {
   var colladaModel;
   loader.load('../models/bunny.dae', (collada) => {
     colladaModel = collada.scene;
-    colladaModel.scale.set(128,128,128);
+    colladaModel.scale.set(32,32,32);
     colladaModel.position.set(0,0,0);
 
     colladaModel.children.forEach(function(childModel) {
@@ -84,6 +87,14 @@ function init() {
     scene.add(colladaModel);
   });
 
+  // side: THREE.DoubleSide 両面 CULL=CCW?
+  // var geometry = new THREE.PlaneGeometry( 100000, 100000, 2 );
+  // var material = new THREE.MeshBasicMaterial({ map: renderTargetMap.texture, side: THREE.DoubleSide });
+  // var plane = new THREE.Mesh( geometry, rimLighting );
+  // scene.add( plane );
+  // plane.position.y = -8000;
+  // plane.rotation.x = Math.PI/2;
+
   //
   tick();
 
@@ -92,7 +103,12 @@ function init() {
 
     progress_timer += (0.016*controls.lightspeed);
 
-    renderTargetMap = renderTarget.capture(renderer);
+    camera.updateProjectionMatrix();
+
+    if(checkBuffer < 5) {
+      renderTargetMap = renderTarget.capture(renderer);
+    }
+    // checkBuffer++;
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
@@ -107,6 +123,7 @@ function init() {
     var mLightPosition = mRotate.multiply(mTrans);
     vLightPosition.setFromMatrixPosition(mLightPosition);
 
+    rimLighting.uniforms['coefficient'] = { type: "float", value: (controls.coefficient - 100.0) / 100.0 };
     rimLighting.uniforms['texture0'] = { type: "t", value: renderTargetMap.texture };
 
     // 光源の位置に設定
