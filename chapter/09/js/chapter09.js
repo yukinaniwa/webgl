@@ -3,25 +3,26 @@
 // window.addEventListener('DOMContentLoaded', init);
 window.addEventListener('load', init);
 
+var cubeTexturePath = '../textures/cubemap/'
+
 function init() {
   const width = window.parent.screen.width;
   const height = window.parent.screen.height;
 
   const renderer = initRenderer(width, height);
   const scene = initScene(width, height);
-  const camera = initCamera(width, height, 0, 16, -200);
+  const camera = initCamera(width, height, 0, 16, -360);
   initCameraControls(renderer, camera, 0, 32, 32);
   const stats = attachFpsView()
 
   var progress_timer = 0;
-  var checkBuffer = 0;
 
   // RENDER TARGET
-  var renderTarget = new RenderTarget(width, height, scene, camera);
-  var renderTargetMap = renderTarget.capture(renderer);
+  var renderTarget = new RenderTarget(renderer, width, height);
+  var renderTargetMap = renderTarget.capture(renderer, camera);
 
   var cubeTexture = new THREE.CubeTextureLoader()
-  	.setPath('../textures/cubemap/chapel/')
+  	.setPath(cubeTexturePath)
   	.load( [
   		'posx.jpg',
   		'negx.jpg',
@@ -71,29 +72,16 @@ function init() {
       objColor: { type: "v3", value: new THREE.Vector3(1, 1, 1) },
       coefficient: { type: "float", value: controls.coefficient },
     },
-    // side: THREE.DoubleSide,
   });
 
   // COLLADA
   const loader = new THREE.ColladaLoader();
-  var bunnyModel;
-  loader.load('../models/bunny.dae', (collada) => {
-    bunnyModel = collada.scene;
-    bunnyModel.scale.set(50,50,50);
-    bunnyModel.position.set(-50,0,0);
-
-    bunnyModel.children.forEach(function(childModel) {
-      childModel.material = stealthShader;
-    });
-
-    scene.add(bunnyModel);
-  });
 
   var dragonModel;
   loader.load('../models/dragon.dae', (collada) => {
     dragonModel = collada.scene;
-    dragonModel.scale.set(50,50,50);
-    dragonModel.position.set(50,0,0);
+    dragonModel.scale.set(108,108,108);
+    dragonModel.position.set(0,0,0);
 
     dragonModel.children.forEach(function(childModel) {
       childModel.material = stealthShader;
@@ -110,12 +98,7 @@ function init() {
 
     progress_timer += (0.016*controls.lightspeed);
 
-    camera.updateProjectionMatrix();
-
-    if(checkBuffer < 5) {
-      renderTargetMap = renderTarget.capture(renderer);
-    }
-    // checkBuffer++;
+    renderTargetMap = renderTarget.capture(renderer, camera);
 
     // 移動行列を作成
     var mTrans = new THREE.Matrix4();
@@ -147,23 +130,33 @@ function init() {
   Render Target
 */
 class RenderTarget {
-  constructor(width, height, scene, camera) {
+  constructor(renderer, width, height) {
 
     this.bufferWidth = width;
     this.bufferHeight = height;
 
-    this.bufferScene = scene;
-    this.cameraTarget = camera;
-
+    this.bufferScene = initScene(width, height);
     this.renderTarget = new THREE.WebGLRenderTarget(this.bufferWidth, this.bufferHeight, {
         magFilter: THREE.LinearFilter,
         minFilter: THREE.LinearFilter
     });
+
+    var cubeTexture = new THREE.CubeTextureLoader()
+    	.setPath(cubeTexturePath)
+    	.load( [
+    		'posx.jpg',
+    		'negx.jpg',
+    		'posy.jpg',
+    		'negy.jpg',
+    		'posz.jpg',
+    		'negz.jpg'
+    	] );
+
+    this.bufferScene.background = cubeTexture;
   }
 
-  capture(renderer) {
-
-    renderer.render(this.bufferScene, this.cameraTarget, this.renderTarget);
+  capture(renderer, camera) {
+    renderer.render(this.bufferScene, camera, this.renderTarget);
 
     return this.renderTarget;
   }
