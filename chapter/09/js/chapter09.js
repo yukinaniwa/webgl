@@ -113,7 +113,7 @@ function init() {
     var mTrans = new THREE.Matrix4();
     mTrans.makeTranslation(320, 220, 0);
     var mRotate = new THREE.Matrix4();
-    mRotate.makeRotationAxis( new THREE.Vector3(0, 1, 0), progress_timer);
+    mRotate.makeRotationAxis( new THREE.Vector3(0, 1, 0), progress_timer*0.5);
     var mLightPosition = mRotate.multiply(mTrans);
     vLightPosition.setFromMatrixPosition(mLightPosition);
 
@@ -190,7 +190,7 @@ class RenderTarget {
     var mTrans = new THREE.Matrix4();
     mTrans.makeTranslation(320, 220, 0);
     var mRotate = new THREE.Matrix4();
-    mRotate.makeRotationAxis( new THREE.Vector3(0, 1, 0), progress_timer);
+    mRotate.makeRotationAxis( new THREE.Vector3(0, 1, 0), progress_timer*0.5);
     var mLightPosition = mRotate.multiply(mTrans);
     this.vLightPosition.setFromMatrixPosition(mLightPosition);
 
