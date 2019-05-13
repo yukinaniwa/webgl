@@ -18,7 +18,7 @@ void main() {
 
   vec3 modelPosition = (modelMatrix * vec4(position, 1.0)).xyz;
   vec3 modelNormal = normalize((modelMatrix * vec4(normal, 1.0)).xyz);
-  vTextureCoords   = textureMatrix * vec4(modelPosition + modelNormal * (coefficient * 0.64), 1.0);
+  vTextureCoords   = textureMatrix * vec4(modelPosition + modelNormal * coefficient, 1.0);
 
   gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( position , 1.0);
 }
